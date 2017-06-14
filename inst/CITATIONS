@@ -1,0 +1,17 @@
+citHeader("To cite package 'SaTScanMapper' in publications use: NCI, NIH")
+
+## R >= 3.2.2 passes package metadata to citation().
+
+if(!exists("meta") || is.null(meta)) meta <- packageDescription("SaTScanMapper")
+       
+       year <- sub(".*(2[[:digit:]]{3})-.*", "\\1", meta$Date)
+       vers <- paste("R package version", meta$Version)
+       citEntry(entry="Manual",
+       title = "SatScan Data Analysis and Mapping",
+       author = personList(as.person("Person 1"),
+                           as.person("Person 2"),
+                           person("NCI-SatScan R Program Support")),
+       year = "2017",
+       note = "<none>",
+       textVersion =
+            paste("<none>", sep=""))

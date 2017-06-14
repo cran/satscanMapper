@@ -1,0 +1,861 @@
+                                 _____________________________
+
+                                        SaTScan v9.4.4
+                                 _____________________________
+
+
+Program run on: Fri Jan 13 15:30:36 2017
+
+Purely Spatial analysis
+scanning for clusters with high or low rates
+using the Discrete Poisson model.
+_______________________________________________________________________________________________
+
+SUMMARY OF DATA
+
+Study period.......................: 2000/1/1 to 2000/12/31
+Number of locations................: 3107
+Total population...................: 158504689
+Total number of cases..............: 221083
+Annual cases / 100000..............: 139.2
+_______________________________________________________________________________________________
+
+CLUSTERS DETECTED
+
+1.Location IDs included.: 32003
+  Overlap with clusters.: No Overlap
+  Coordinates...........: (-1.68306e+006,24749.9)
+  Semiminor axis........: 0
+  Semimajor axis........: 0
+  Angle (degrees).......: 0
+  Shape.................: 1.00
+  Gini Cluster..........: Yes
+  Population............: 995151
+  Number of cases.......: 3
+  Expected cases........: 1388.04
+  Annual cases / 100000.: 0.3
+  Observed / expected...: 0.0022
+  Relative risk.........: 0.0021
+  Log likelihood ratio..: 1370.986415
+  Test statistic........: 1370.986415
+  P-value...............: < 0.00000000000000001
+
+2.Location IDs included.: 48479, 48283, 48131, 48127, 48505, 48311, 48247, 48249, 48163, 48507,
+                          48297, 48047, 48323, 48427, 48013, 48273, 48355, 48025, 48325, 48409,
+                          48463, 48261, 48215, 48255, 48493, 48029, 48271, 48175, 48489, 48019,
+                          48391, 48007, 48385, 48123, 48187, 48259, 48091, 48265, 48061, 48469,
+                          48177, 48137, 48057, 48209, 48171, 48055, 48031, 48465, 48285, 48239,
+                          48267, 48453, 48435, 48021
+  Overlap with clusters.: No Overlap
+  Coordinates...........: (-330335,-1.07882e+006)
+  Semiminor axis........: 325644.70
+  Semimajor axis........: 325644.70
+  Angle (degrees).......: 0
+  Shape.................: 1.00
+  Gini Cluster..........: Yes
+  Population............: 3169745
+  Number of cases.......: 3220
+  Expected cases........: 4421.17
+  Annual cases / 100000.: 101.4
+  Observed / expected...: 0.73
+  Relative risk.........: 0.72
+  Log likelihood ratio..: 183.680390
+  Test statistic........: 183.680390
+  P-value...............: < 0.00000000000000001
+
+3.Location IDs included.: 41025, 41023, 41001, 41061, 32031
+  Overlap with clusters.: No Overlap
+  Coordinates...........: (-1.8429e+006,846472)
+  Semiminor axis........: 93266.33
+  Semimajor axis........: 279798.99
+  Angle (degrees).......: 60.00
+  Shape.................: 3.00
+  Gini Cluster..........: Yes
+  Population............: 241321
+  Number of cases.......: 54
+  Expected cases........: 336.60
+  Annual cases / 100000.: 22.3
+  Observed / expected...: 0.16
+  Relative risk.........: 0.16
+  Log likelihood ratio..: 183.961855
+  Test statistic........: 159.315639
+  P-value...............: < 0.00000000000000001
+
+4.Location IDs included.: 35023, 4011, 35017, 4001, 4009, 35003, 35029, 4017, 4003, 49037,
+                          4007, 49055, 35006, 35031, 49017, 49015, 35051, 49039, 49041, 49025,
+                          49007, 35013, 35045, 4005, 8083, 49049, 49031, 49051, 49019, 4023,
+                          49035, 49013, 49043, 49029, 8033, 4021, 49011, 49057, 35053, 48141,
+                          49005, 49023, 8113, 49033, 56041, 49047, 16041, 16071, 8067, 49045,
+                          16007, 49027, 49003, 35061, 16005
+  Overlap with clusters.: No Overlap
+  Coordinates...........: (-1.1933e+006,-544387)
+  Semiminor axis........: 248264.83
+  Semimajor axis........: 1241324.14
+  Angle (degrees).......: -84.00
+  Shape.................: 5.00
+  Gini Cluster..........: Yes
+  Population............: 2641242
+  Number of cases.......: 2572
+  Expected cases........: 3684.02
+  Annual cases / 100000.: 97.2
+  Observed / expected...: 0.70
+  Relative risk.........: 0.69
+  Log likelihood ratio..: 190.684839
+  Test statistic........: 142.128087
+  P-value...............: < 0.00000000000000001
+
+5.Location IDs included.: 36013, 42123, 42049, 36009, 42053, 36029, 42121, 42039, 42083, 42031,
+                          36063, 42047, 42065, 42085, 36121, 36037, 42019, 42005, 36003, 36073,
+                          42073, 39007, 42023, 42063, 39155, 42033, 36051, 42105, 42007, 42003,
+                          39099, 36055, 42129, 42021, 39029
+  Overlap with clusters.: No Overlap
+  Coordinates...........: (1.35692e+006,648738)
+  Semiminor axis........: 150036.38
+  Semimajor axis........: 225054.57
+  Angle (degrees).......: 90.00
+  Shape.................: 1.50
+  Gini Cluster..........: Yes
+  Population............: 3168402
+  Number of cases.......: 5546
+  Expected cases........: 4419.30
+  Annual cases / 100000.: 174.7
+  Observed / expected...: 1.25
+  Relative risk.........: 1.26
+  Log likelihood ratio..: 135.706951
+  Test statistic........: 132.965113
+  P-value...............: < 0.00000000000000001
+
+6.Location IDs included.: 36103, 9001, 9009, 36059, 36119, 9007, 36079
+  Overlap with clusters.: No Overlap
+  Coordinates...........: (1.91337e+006,609721)
+  Semiminor axis........: 67652.06
+  Semimajor axis........: 101478.08
+  Angle (degrees).......: -45.00
+  Shape.................: 1.50
+  Gini Cluster..........: Yes
+  Population............: 3018490
+  Number of cases.......: 5256
+  Expected cases........: 4210.20
+  Annual cases / 100000.: 173.8
+  Observed / expected...: 1.25
+  Relative risk.........: 1.25
+  Log likelihood ratio..: 122.821806
+  Test statistic........: 120.340302
+  P-value...............: < 0.00000000000000001
+
+7.Location IDs included.: 48477, 48051, 48015, 48473, 48041, 48331, 48287, 48157, 48089, 48185,
+                          48395, 48481, 48149, 48145, 48039, 48201, 48027
+  Overlap with clusters.: No Overlap
+  Coordinates...........: (-37964.9,-813700)
+  Semiminor axis........: 78348.43
+  Semimajor axis........: 156696.86
+  Angle (degrees).......: -60.00
+  Shape.................: 2.00
+  Gini Cluster..........: Yes
+  Population............: 3038313
+  Number of cases.......: 3257
+  Expected cases........: 4237.85
+  Annual cases / 100000.: 107.0
+  Observed / expected...: 0.77
+  Relative risk.........: 0.77
+  Log likelihood ratio..: 125.661623
+  Test statistic........: 118.474915
+  P-value...............: < 0.00000000000000001
+
+8.Location IDs included.: 20209
+  Overlap with clusters.: No Overlap
+  Coordinates...........: (105882,181965)
+  Semiminor axis........: 0
+  Semimajor axis........: 0
+  Angle (degrees).......: 0
+  Shape.................: 1.00
+  Gini Cluster..........: Yes
+  Population............: 80727
+  Number of cases.......: 4
+  Expected cases........: 112.60
+  Annual cases / 100000.: 4.9
+  Observed / expected...: 0.036
+  Relative risk.........: 0.036
+  Log likelihood ratio..: 95.274906
+  Test statistic........: 95.274906
+  P-value...............: < 0.00000000000000001
+
+9.Location IDs included.: 6065, 6025, 6071, 4027, 6107, 6029
+  Overlap with clusters.: No Overlap
+  Coordinates...........: (-1.82612e+006,-227349)
+  Semiminor axis........: 96656.29
+  Semimajor axis........: 386625.16
+  Angle (degrees).......: -60.00
+  Shape.................: 4.00
+  Gini Cluster..........: Yes
+  Population............: 3012490
+  Number of cases.......: 3253
+  Expected cases........: 4201.83
+  Annual cases / 100000.: 107.8
+  Observed / expected...: 0.77
+  Relative risk.........: 0.77
+  Log likelihood ratio..: 118.322374
+  Test statistic........: 94.657899
+  P-value...............: < 0.00000000000000001
+
+10.Location IDs included.: 48121, 48097, 48497, 48085, 48439, 48113
+   Overlap with clusters.: No Overlap
+   Coordinates...........: (-103464,-480142)
+   Semiminor axis........: 58017.54
+   Semimajor axis........: 58017.54
+   Angle (degrees).......: 0
+   Shape.................: 1.00
+   Gini Cluster..........: Yes
+   Population............: 3038994
+   Number of cases.......: 3387
+   Expected cases........: 4238.80
+   Annual cases / 100000.: 111.2
+   Observed / expected...: 0.80
+   Relative risk.........: 0.80
+   Log likelihood ratio..: 93.646322
+   Test statistic........: 93.646322
+   P-value...............: < 0.00000000000000001
+
+11.Location IDs included.: 12103, 12081, 12057, 12115, 12101, 12053, 12017, 12015, 12049,
+                           12027, 12071, 12075, 12119, 12105, 12029, 12041, 12055, 12067,
+                           12083, 12123, 12043, 12069
+   Overlap with clusters.: No Overlap
+   Coordinates...........: (1.30918e+006,-975184)
+   Semiminor axis........: 127138.72
+   Semimajor axis........: 254277.43
+   Angle (degrees).......: -60.00
+   Shape.................: 2.00
+   Gini Cluster..........: Yes
+   Population............: 3155045
+   Number of cases.......: 5285
+   Expected cases........: 4400.67
+   Annual cases / 100000.: 167.2
+   Observed / expected...: 1.20
+   Relative risk.........: 1.21
+   Log likelihood ratio..: 85.244151
+   Test statistic........: 80.368956
+   P-value...............: < 0.00000000000000001
+
+12.Location IDs included.: 42079, 42025, 42131, 42037, 42069, 42113, 42107, 42089, 42093,
+                           42097, 42077, 42095, 42115, 42127, 42015, 42103, 42011, 34041,
+                           42081, 42119, 42075, 42109, 42043, 34037, 36007, 34019, 36107,
+                           36105, 42091, 42017, 42117, 36015, 34027
+   Overlap with clusters.: No Overlap
+   Coordinates...........: (1.65313e+006,586766)
+   Semiminor axis........: 125684.09
+   Semimajor axis........: 125684.09
+   Angle (degrees).......: 0
+   Shape.................: 1.00
+   Gini Cluster..........: Yes
+   Population............: 2947078
+   Number of cases.......: 4929
+   Expected cases........: 4110.60
+   Annual cases / 100000.: 166.9
+   Observed / expected...: 1.20
+   Relative risk.........: 1.20
+   Log likelihood ratio..: 78.090443
+   Test statistic........: 78.090443
+   P-value...............: < 0.00000000000000001
+
+13.Location IDs included.: 23009, 23019, 23027, 23029, 23013, 23021, 23015, 23003, 23011,
+                           23025, 23023, 23007, 23001, 23005, 23017, 23031, 33007, 33003,
+                           33017, 50009, 33015, 33001, 25001, 25009, 25019, 33009, 25023
+   Overlap with clusters.: No Overlap
+   Coordinates...........: (2.15648e+006,1.11836e+006)
+   Semiminor axis........: 292328.76
+   Semimajor axis........: 584657.52
+   Angle (degrees).......: -60.00
+   Shape.................: 2.00
+   Gini Cluster..........: Yes
+   Population............: 1778126
+   Number of cases.......: 3122
+   Expected cases........: 2480.14
+   Annual cases / 100000.: 175.2
+   Observed / expected...: 1.26
+   Relative risk.........: 1.26
+   Log likelihood ratio..: 77.639689
+   Test statistic........: 73.199401
+   P-value...............: < 0.00000000000000001
+
+14.Location IDs included.: 10005, 24045, 34009, 24039, 24019, 24047, 34001, 24011, 51133,
+                           34011, 10001, 51103, 51119, 51159, 24041, 51073, 34029, 51001,
+                           51097, 51115, 51193, 24037, 51095, 51127, 34005, 51830, 51057,
+                           24035, 51036, 51199, 51101, 34007, 24009, 34033, 34015, 51181,
+                           51149, 51670, 51700, 51735, 51730, 51570, 51131, 34025, 51087,
+                           51183, 24029, 51650, 51093
+   Overlap with clusters.: No Overlap
+   Coordinates...........: (1.76268e+006,321910)
+   Semiminor axis........: 87188.40
+   Semimajor axis........: 261565.21
+   Angle (degrees).......: 60.00
+   Shape.................: 3.00
+   Gini Cluster..........: Yes
+   Population............: 2644821
+   Number of cases.......: 4409
+   Expected cases........: 3689.01
+   Annual cases / 100000.: 166.4
+   Observed / expected...: 1.20
+   Relative risk.........: 1.20
+   Log likelihood ratio..: 67.283745
+   Test statistic........: 58.269433
+   P-value...............: < 0.00000000000000001
+
+15.Location IDs included.: 6069, 6053, 6047, 6043, 6109, 6099, 6039, 6085, 6009, 6003, 6087,
+                           6019, 6051, 32005, 6077, 32019, 6005, 32021, 32510, 6031
+   Overlap with clusters.: No Overlap
+   Coordinates...........: (-2.19625e+006,190606)
+   Semiminor axis........: 124993.73
+   Semimajor axis........: 374981.18
+   Angle (degrees).......: 40.00
+   Shape.................: 3.00
+   Gini Cluster..........: Yes
+   Population............: 2812260
+   Number of cases.......: 3281
+   Expected cases........: 3922.55
+   Annual cases / 100000.: 116.4
+   Observed / expected...: 0.84
+   Relative risk.........: 0.83
+   Log likelihood ratio..: 56.531124
+   Test statistic........: 48.957389
+   P-value...............: 0.00000000000000078
+
+16.Location IDs included.: 17009, 17169, 17001, 17149, 17017, 17171, 17137, 17109, 17067,
+                           17057, 17061, 29127, 17125, 29163, 17129, 29173, 29111, 17013,
+                           17167, 17071, 29045, 19111, 17187, 29113, 17083, 17117, 19057,
+                           29205, 17095, 17107, 29137, 29103, 17179, 17143, 29007, 29199,
+                           29139, 29183, 19087, 17021, 19177, 17135, 29219, 17131, 17119,
+                           19115, 17175, 29189, 17115
+   Overlap with clusters.: No Overlap
+   Coordinates...........: (444222,288473)
+   Semiminor axis........: 151602.31
+   Semimajor axis........: 151602.31
+   Angle (degrees).......: 0
+   Shape.................: 1.00
+   Gini Cluster..........: Yes
+   Population............: 1620722
+   Number of cases.......: 2706
+   Expected cases........: 2260.59
+   Annual cases / 100000.: 166.6
+   Observed / expected...: 1.20
+   Relative risk.........: 1.20
+   Log likelihood ratio..: 41.706096
+   Test statistic........: 41.706096
+   P-value...............: 0.00000000000045
+
+17.Location IDs included.: 37199, 37121, 37115, 37011, 37027, 47171, 37111, 47029, 37021,
+                           37189, 37023, 37087, 37193, 47155, 37003, 47019, 47059, 37173,
+                           47179, 47089, 47009, 37197, 37009, 47091, 37097, 47063, 37035,
+                           37171, 37005, 37075, 37059, 37089, 47123, 47093, 37067, 37161,
+                           37099, 47105, 37169, 47163, 47057, 37175, 47073, 37149, 37109,
+                           47107, 51077, 37113, 47145, 51640, 47121, 51520, 37039, 37045,
+                           37157, 37057, 37081, 37159, 47001, 47143, 51141, 51035, 47173,
+                           37043, 47139, 51191, 47011, 47067, 51089, 51690, 47007, 37033,
+                           37071, 37001, 47065, 51590, 51173, 51169, 47153, 13281, 47025,
+                           47129, 47035
+   Overlap with clusters.: No Overlap
+   Coordinates...........: (1.22037e+006,-90123.2)
+   Semiminor axis........: 96499.13
+   Semimajor axis........: 289497.39
+   Angle (degrees).......: 20.00
+   Shape.................: 3.00
+   Gini Cluster..........: Yes
+   Population............: 3122510
+   Number of cases.......: 5001
+   Expected cases........: 4355.29
+   Annual cases / 100000.: 159.8
+   Observed / expected...: 1.15
+   Relative risk.........: 1.15
+   Log likelihood ratio..: 46.624584
+   Test statistic........: 40.378074
+   P-value...............: 0.0000000000015
+
+18.Location IDs included.: 26157, 26087, 26011, 26017, 26147, 26129, 26099, 26051, 26151,
+                           26143, 26039, 26049, 26145, 26063, 26069, 26111, 26135, 26079,
+                           26009, 26125, 26137, 26113, 26029, 26035, 39035, 39085, 39055,
+                           26055, 26119
+   Overlap with clusters.: No Overlap
+   Coordinates...........: (1.00998e+006,735249)
+   Semiminor axis........: 75177.47
+   Semimajor axis........: 300709.89
+   Angle (degrees).......: -45.00
+   Shape.................: 4.00
+   Gini Cluster..........: Yes
+   Population............: 2683269
+   Number of cases.......: 4348
+   Expected cases........: 3742.63
+   Annual cases / 100000.: 161.7
+   Observed / expected...: 1.16
+   Relative risk.........: 1.16
+   Log likelihood ratio..: 47.357404
+   Test statistic........: 37.885923
+   P-value...............: 0.000000000013
+
+19.Location IDs included.: 36047, 36005
+   Overlap with clusters.: No Overlap
+   Coordinates...........: (1.83144e+006,565775)
+   Semiminor axis........: 6890.77
+   Semimajor axis........: 27563.10
+   Angle (degrees).......: 75.00
+   Shape.................: 4.00
+   Gini Cluster..........: Yes
+   Population............: 2105512
+   Number of cases.......: 2450
+   Expected cases........: 2936.78
+   Annual cases / 100000.: 116.1
+   Observed / expected...: 0.83
+   Relative risk.........: 0.83
+   Log likelihood ratio..: 43.319176
+   Test statistic........: 34.655341
+   P-value...............: 0.00000000023
+
+20.Location IDs included.: 41039, 41053, 41003, 41071, 41043, 41019, 41057, 41067, 41047,
+                           41029, 41007, 41041, 41035, 41009, 53069, 53049, 6093, 41005, 41051,
+                           6089, 53027, 53011, 53015, 41033, 41011, 6049, 53067, 53045, 6063,
+                           53031, 41017, 53009, 6007, 6103, 6035, 53041, 6115, 6057, 6091,
+                           41027, 53059, 6061, 41031, 6101, 6105, 41015, 6021, 6017
+   Overlap with clusters.: No Overlap
+   Coordinates...........: (-2.11881e+006,1.02174e+006)
+   Semiminor axis........: 155172.00
+   Semimajor axis........: 620688.00
+   Angle (degrees).......: 90.00
+   Shape.................: 4.00
+   Gini Cluster..........: Yes
+   Population............: 3141933
+   Number of cases.......: 4992
+   Expected cases........: 4382.38
+   Annual cases / 100000.: 158.6
+   Observed / expected...: 1.14
+   Relative risk.........: 1.14
+   Log likelihood ratio..: 41.419538
+   Test statistic........: 33.135631
+   P-value...............: 0.00000000088
+
+21.Location IDs included.: 12009, 12061, 12111, 12085, 12127, 12093, 12099
+   Overlap with clusters.: No Overlap
+   Coordinates...........: (1.49518e+006,-905669)
+   Semiminor axis........: 36797.08
+   Semimajor axis........: 183985.42
+   Angle (degrees).......: -72.00
+   Shape.................: 5.00
+   Gini Cluster..........: Yes
+   Population............: 1548532
+   Number of cases.......: 2589
+   Expected cases........: 2159.90
+   Annual cases / 100000.: 166.8
+   Observed / expected...: 1.20
+   Relative risk.........: 1.20
+   Log likelihood ratio..: 40.473140
+   Test statistic........: 30.166897
+   P-value...............: 0.000000012
+
+22.Location IDs included.: 12097, 12095
+   Overlap with clusters.: No Overlap
+   Coordinates...........: (1.45809e+006,-937326)
+   Semiminor axis........: 39458.04
+   Semimajor axis........: 59187.05
+   Angle (degrees).......: 90.00
+   Shape.................: 1.50
+   Gini Cluster..........: Yes
+   Population............: 757875
+   Number of cases.......: 832
+   Expected cases........: 1057.09
+   Annual cases / 100000.: 109.6
+   Observed / expected...: 0.79
+   Relative risk.........: 0.79
+   Log likelihood ratio..: 25.988182
+   Test statistic........: 25.463114
+   P-value...............: 0.00000077
+
+23.Location IDs included.: 51107, 54037, 51685, 51683, 51153, 51600
+   Overlap with clusters.: No Overlap
+   Coordinates...........: (1.56382e+006,328955)
+   Semiminor axis........: 23972.99
+   Semimajor axis........: 47945.97
+   Angle (degrees).......: -60.00
+   Shape.................: 2.00
+   Gini Cluster..........: Yes
+   Population............: 454670
+   Number of cases.......: 460
+   Expected cases........: 634.18
+   Annual cases / 100000.: 101.0
+   Observed / expected...: 0.73
+   Relative risk.........: 0.72
+   Log likelihood ratio..: 26.538669
+   Test statistic........: 25.020897
+   P-value...............: 0.0000011
+
+24.Location IDs included.: 8063, 8017, 8125, 8061, 8099, 8095, 8121, 8075, 8115, 8009, 31033,
+                           31049, 8011, 20071, 31123, 20199, 20075, 40025, 20181, 31069, 20187,
+                           20023, 8073, 20129, 31013, 31057, 48111, 31029, 48421, 31105, 31045,
+                           31161, 31007, 8087, 48205, 31135, 31157, 48341, 20203, 31101, 40139,
+                           20093, 31005, 20067, 8025, 48359, 31165, 8089, 20189, 48375, 31075,
+                           46113, 46047, 20109, 48195, 35059, 48117, 48381, 46033, 48233, 8039,
+                           20193, 46103, 20153, 48069, 48065, 31087, 48437, 20171, 31085,
+                           48369, 8005, 8001, 8123, 56015, 48011, 20081, 48279, 20175, 46093,
+                           8071, 48189, 46007, 46081, 20055, 31117, 31091, 48017, 46019, 48357,
+                           48219, 48045, 48303, 56027, 46071, 35037, 35021, 48393, 48153,
+                           35009, 56021, 8041, 31031, 48079, 48179, 48445, 48305, 31111, 8101,
+                           46063, 48107, 56045, 48129, 20063, 20101, 46105, 20069, 40007,
+                           48501, 48115, 46055, 20179, 20039, 31145, 48169, 56011, 20119,
+                           35041, 56031, 48165, 38011, 48191, 48033, 48345, 46137, 48317,
+                           31063, 8031, 38001, 8035, 38087, 31171, 31113, 8014, 48295, 48125,
+                           48003, 30011, 48227, 48211, 48329, 38041, 46121, 48483, 48263,
+                           48415, 48173, 48135, 35007, 38007, 38089, 30025, 46095, 48087,
+                           38033, 35025
+   Overlap with clusters.: No Overlap
+   Coordinates...........: (-563728,221948)
+   Semiminor axis........: 219976.60
+   Semimajor axis........: 879906.40
+   Angle (degrees).......: 90.00
+   Shape.................: 4.00
+   Gini Cluster..........: Yes
+   Population............: 2711884
+   Number of cases.......: 3334
+   Expected cases........: 3782.55
+   Annual cases / 100000.: 122.7
+   Observed / expected...: 0.88
+   Relative risk.........: 0.88
+   Log likelihood ratio..: 28.176124
+   Test statistic........: 22.540899
+   P-value...............: 0.000010
+
+25.Location IDs included.: 55031, 55113, 27017, 55129, 55107, 55119, 27061, 55007, 55099,
+                           55073, 55003, 27137, 55069, 55013, 27071, 27115, 55097, 55019,
+                           55017, 27001, 55005, 55141, 55135, 55137, 27007, 27077, 55051,
+                           55139, 55047, 55085, 55001, 55115, 55077, 55067, 55039, 55035,
+                           55087, 27135, 55095, 27021, 55015, 55078, 55027, 55053, 55057,
+                           55131, 55117, 55033, 27065, 55089, 55125, 55021, 27075, 27035,
+                           27029, 55133
+   Overlap with clusters.: No Overlap
+   Coordinates...........: (314575,1.00473e+006)
+   Semiminor axis........: 124226.59
+   Semimajor axis........: 496906.35
+   Angle (degrees).......: -45.00
+   Shape.................: 4.00
+   Gini Cluster..........: Yes
+   Population............: 1504662
+   Number of cases.......: 2438
+   Expected cases........: 2098.71
+   Annual cases / 100000.: 161.7
+   Observed / expected...: 1.16
+   Relative risk.........: 1.16
+   Log likelihood ratio..: 26.320055
+   Test statistic........: 21.056044
+   P-value...............: 0.000038
+
+26.Location IDs included.: 13015, 13115, 13057, 13129, 13233, 13223, 13227, 13067, 13055,
+                           13117, 1019, 13085, 13121, 13143, 13135, 13123, 13097, 13295, 13089,
+                           1049, 13213, 13313, 13139, 13187, 13013, 13045, 13047, 13083, 13247,
+                           13157, 1029, 1055, 13111, 13297, 13063, 1015, 13311, 13011, 13291,
+                           1071, 1095
+   Overlap with clusters.: No Overlap
+   Coordinates...........: (1.018e+006,-305220)
+   Semiminor axis........: 89296.29
+   Semimajor axis........: 133944.43
+   Angle (degrees).......: 0
+   Shape.................: 1.50
+   Gini Cluster..........: Yes
+   Population............: 3129927
+   Number of cases.......: 3956
+   Expected cases........: 4365.64
+   Annual cases / 100000.: 126.1
+   Observed / expected...: 0.91
+   Relative risk.........: 0.90
+   Log likelihood ratio..: 20.236288
+   Test statistic........: 19.827432
+   P-value...............: 0.00011
+
+27.Location IDs included.: 6041, 6097, 6055
+   Overlap with clusters.: No Overlap
+   Coordinates...........: (-2.29154e+006,388613)
+   Semiminor axis........: 35041.33
+   Semimajor axis........: 70082.65
+   Angle (degrees).......: 60.00
+   Shape.................: 2.00
+   Gini Cluster..........: Yes
+   Population............: 450718
+   Number of cases.......: 791
+   Expected cases........: 628.66
+   Annual cases / 100000.: 175.1
+   Observed / expected...: 1.26
+   Relative risk.........: 1.26
+   Log likelihood ratio..: 19.417473
+   Test statistic........: 18.306969
+   P-value...............: 0.00043
+
+28.Location IDs included.: 12086
+   Overlap with clusters.: No Overlap
+   Coordinates...........: (1.55984e+006,-1.19463e+006)
+   Semiminor axis........: 0
+   Semimajor axis........: 0
+   Angle (degrees).......: 0
+   Shape.................: 1.00
+   Gini Cluster..........: Yes
+   Population............: 1343938
+   Number of cases.......: 1648
+   Expected cases........: 1874.53
+   Annual cases / 100000.: 122.4
+   Observed / expected...: 0.88
+   Relative risk.........: 0.88
+   Log likelihood ratio..: 14.392013
+   Test statistic........: 14.392013
+   P-value...............: 0.016
+
+29.Location IDs included.: 13277, 13155, 13071, 13321, 13017, 13019, 13287, 13075, 13205,
+                           13069, 13095, 13271, 13161, 13003, 13007, 13315, 13275, 13131,
+                           13005, 13081, 13177, 13173, 13001, 13027, 13201, 13087, 13309,
+                           13037, 13091, 13209, 13253, 13279, 13099, 13185, 13273, 13267,
+                           13229, 13235, 13093, 12039, 13305, 13109, 13261, 12063, 13065,
+                           13283, 13183, 13243, 13299, 1069, 13061, 12073, 13175, 13043, 13023,
+                           12065, 1067, 13179, 13101, 13031, 13025, 13029, 13307, 12013, 12079,
+                           13107, 13153, 13193, 12077, 13239, 12133, 13249, 12059, 13103,
+                           13191, 13167
+   Overlap with clusters.: No Overlap
+   Coordinates...........: (1.17791e+006,-598240)
+   Semiminor axis........: 117747.17
+   Semimajor axis........: 235494.35
+   Angle (degrees).......: 30.00
+   Shape.................: 2.00
+   Gini Cluster..........: Yes
+   Population............: 1095688
+   Number of cases.......: 1321
+   Expected cases........: 1528.27
+   Annual cases / 100000.: 120.3
+   Observed / expected...: 0.86
+   Relative risk.........: 0.86
+   Log likelihood ratio..: 14.835580
+   Test statistic........: 13.987119
+   P-value...............: 0.020
+
+30.Location IDs included.: 46051, 27073, 27173, 46091, 46039, 46037, 46109, 46029, 27011,
+                           27083, 27081, 27127, 38081, 27023, 38021, 46013, 27033, 46057,
+                           27155, 27151, 27101, 27015, 38045, 27129, 46011, 27165, 27149,
+                           46025, 27117, 27091, 38073, 27063, 38047, 38077, 38051, 27013,
+                           27103, 46089, 27067, 27043, 27105, 19063, 46101, 38093, 27143,
+                           46115, 27051, 38043, 27121, 19059, 19189, 19109, 46077, 38003,
+                           27133, 27161, 46045, 19081, 27085, 19143, 27047, 19147, 19195,
+                           27079, 27093, 27167, 38015, 46079, 38029, 19033, 19041, 19197,
+                           27147, 19091, 27041, 19069, 38083, 38103, 46049, 38031, 46099, 19067
+   Overlap with clusters.: No Overlap
+   Coordinates...........: (-60265.1,858250)
+   Semiminor axis........: 134458.33
+   Semimajor axis........: 403374.98
+   Angle (degrees).......: -40.00
+   Shape.................: 3.00
+   Gini Cluster..........: No
+   Population............: 687649
+   Number of cases.......: 1127
+   Expected cases........: 959.14
+   Annual cases / 100000.: 163.6
+   Observed / expected...: 1.18
+   Relative risk.........: 1.18
+   Log likelihood ratio..: 13.964479
+   Test statistic........: 12.093594
+   P-value...............: 0.107
+
+31.Location IDs included.: 18029, 18137, 18115, 39061, 18047, 18155, 21015, 39017, 18077,
+                           21077, 18079, 21117, 21041, 18031, 18161, 21223, 39165, 21037,
+                           39135, 18041, 18143, 39025, 39113, 21081, 21103, 21187, 18005,
+                           18019, 18139, 21185, 18071, 18177, 21191, 39027, 39057, 18175,
+                           18145, 18043, 39109, 39015, 21211, 39023, 18013, 21023, 21111,
+                           39037, 21073, 18065
+   Overlap with clusters.: No Overlap
+   Coordinates...........: (942380,239421)
+   Semiminor axis........: 93053.19
+   Semimajor axis........: 139579.79
+   Angle (degrees).......: 45.00
+   Shape.................: 1.50
+   Gini Cluster..........: No
+   Population............: 2498640
+   Number of cases.......: 3776
+   Expected cases........: 3485.11
+   Annual cases / 100000.: 150.8
+   Observed / expected...: 1.08
+   Relative risk.........: 1.08
+   Log likelihood ratio..: 12.009686
+   Test statistic........: 11.767041
+   P-value...............: 0.133
+
+32.Location IDs included.: 21047, 21219, 47125
+   Overlap with clusters.: No Overlap
+   Coordinates...........: (750275,-34237.7)
+   Semiminor axis........: 24238.94
+   Semimajor axis........: 48477.88
+   Angle (degrees).......: -60.00
+   Shape.................: 2.00
+   Gini Cluster..........: No
+   Population............: 135634
+   Number of cases.......: 125
+   Expected cases........: 189.18
+   Annual cases / 100000.: 92.0
+   Observed / expected...: 0.66
+   Relative risk.........: 0.66
+   Log likelihood ratio..: 12.392146
+   Test statistic........: 11.683427
+   P-value...............: 0.140
+
+33.Location IDs included.: 17043
+   Overlap with clusters.: No Overlap
+   Coordinates...........: (651608,514069)
+   Semiminor axis........: 0
+   Semimajor axis........: 0
+   Angle (degrees).......: 0
+   Shape.................: 1.00
+   Gini Cluster..........: No
+   Population............: 472719
+   Number of cases.......: 783
+   Expected cases........: 659.35
+   Annual cases / 100000.: 165.3
+   Observed / expected...: 1.19
+   Relative risk.........: 1.19
+   Log likelihood ratio..: 10.965234
+   Test statistic........: 10.965234
+   P-value...............: 0.245
+
+34.Location IDs included.: 37051, 37155, 37085, 37093, 37101
+   Overlap with clusters.: No Overlap
+   Coordinates...........: (1.54518e+006,-134883)
+   Semiminor axis........: 33980.90
+   Semimajor axis........: 67961.80
+   Angle (degrees).......: 60.00
+   Shape.................: 2.00
+   Gini Cluster..........: No
+   Population............: 412221
+   Number of cases.......: 470
+   Expected cases........: 574.97
+   Annual cases / 100000.: 113.8
+   Observed / expected...: 0.82
+   Relative risk.........: 0.82
+   Log likelihood ratio..: 10.249505
+   Test statistic........: 9.663326
+   P-value...............: 0.600
+
+35.Location IDs included.: 26023, 18151, 26025, 26059, 26149, 18087, 26077, 39171, 18033,
+                           26075, 18113, 18039, 26027, 26045, 26015, 39039, 26091, 39051,
+                           26159, 18003, 18183, 26065, 39125, 18085, 26005, 39069, 26161,
+                           18141, 26021, 26067, 18099, 39095, 26037, 26093, 26115
+   Overlap with clusters.: No Overlap
+   Coordinates...........: (899150,546547)
+   Semiminor axis........: 124906.07
+   Semimajor axis........: 124906.07
+   Angle (degrees).......: 0
+   Shape.................: 1.00
+   Gini Cluster..........: No
+   Population............: 2137991
+   Number of cases.......: 2758
+   Expected cases........: 2982.08
+   Annual cases / 100000.: 128.7
+   Observed / expected...: 0.92
+   Relative risk.........: 0.92
+   Log likelihood ratio..: 8.753078
+   Test statistic........: 8.753078
+   P-value...............: 0.857
+
+36.Location IDs included.: 5087, 5101, 5143, 5007, 5071, 5015, 5115, 29119, 40041, 5047, 5129,
+                           5009, 5141, 40001, 5033, 5029, 29009, 40115, 29145, 40097, 40035,
+                           5083, 5045
+   Overlap with clusters.: No Overlap
+   Coordinates...........: (202729,-164845)
+   Semiminor axis........: 79933.88
+   Semimajor axis........: 159867.77
+   Angle (degrees).......: -30.00
+   Shape.................: 2.00
+   Gini Cluster..........: No
+   Population............: 583642
+   Number of cases.......: 695
+   Expected cases........: 814.07
+   Annual cases / 100000.: 118.8
+   Observed / expected...: 0.85
+   Relative risk.........: 0.85
+   Log likelihood ratio..: 9.198147
+   Test statistic........: 8.672096
+   P-value...............: 0.872
+_______________________________________________________________________________________________
+
+PARAMETER SETTINGS
+
+Input
+-----
+  Case File        : H:\MyFiles\consulting\Amin\satscan\inc.cas
+  Population File  : H:\MyFiles\consulting\Amin\satscan\inc noadj cir.pop
+  Time Precision   : None
+  Start Time       : 2000/1/1
+  End Time         : 2000/12/31
+  Coordinates File : H:\MyFiles\consulting\Amin\satscan\coord.geo
+  Coordinates      : Cartesian
+
+Analysis
+--------
+  Type of Analysis    : Purely Spatial
+  Probability Model   : Discrete Poisson
+  Scan for Areas with : High or Low Rates
+
+Output
+------
+  Main Results File       : H:\MyFiles\consulting\Amin\satscan\inc noadj ellip hilo 10 nosp
+  Cluster File            : H:\MyFiles\consulting\Amin\satscan\inc noadj ellip hilo 10 nosp.col.dbf
+  Stratified Cluster File : H:\MyFiles\consulting\Amin\satscan\inc noadj ellip hilo 10 nosp.sci.dbf
+  Location File           : H:\MyFiles\consulting\Amin\satscan\inc noadj ellip hilo 10 nosp.gis.dbf
+  Risk Estimates File     : H:\MyFiles\consulting\Amin\satscan\inc noadj ellip hilo 10 nosp.rr.dbf
+  Simulated LLRs File     : H:\MyFiles\consulting\Amin\satscan\inc noadj ellip hilo 10 nosp.llr.dbf
+
+Data Checking
+-------------
+  Temporal Data Check     : Check to ensure that all cases and controls are within the specified temporal study period.
+  Geographical Data Check : Check to ensure that all observations (cases, controls and populations) are within the specified geographical area.
+
+Spatial Neighbors
+-----------------
+  Use Non-Euclidian Neighbors file : No
+  Use Meta Locations File          : No
+  Multiple Coordinates Type        : Allow only one set of coordinates per location ID.
+
+Spatial Window
+--------------
+  Maximum Spatial Cluster Size : 10 percent of population at risk
+  Window Shape                 : Elliptic
+  Non-Compactness Penalty      : Meduim
+  Isotonic Scan                : No
+
+Space And Time Adjustments
+--------------------------
+  Adjust for known relative risks : No
+
+Inference
+---------
+  P-Value Reporting                  : Default Combination
+  Number of Replications             : 999
+  Adjusting for More Likely Clusters : No
+
+Border Analysis
+---------------
+  Report Oliveira's F : No
+
+Spatial Output
+--------------
+  Report Hierarchical Clusters             : No
+  Report Gini Optimized Cluster Collection : Yes
+  Gini Index Based Collection Reporting    : Optimal Only
+  Report Gini Index Cluster Coefficents    : No
+  Restrict Reporting to Smaller Clusters   : No
+
+Other Output
+------------
+  Report Critical Values  : No
+  Report Monte Carlo Rank : No
+
+Elliptic Scan
+-------------
+  Ellipse Shapes                          : 1.5, 2, 3, 4, 5
+  Number of Angles for Each Ellipse Shape : 4, 6, 9, 12, 15
+
+Run Options
+-----------
+  Processer Usage   : All Available Proccessors
+  Suppress Warnings : No
+  Logging Analysis  : Yes
+_______________________________________________________________________________________________
+
+Program completed  : Fri Jan 13 15:32:53 2017
+Total Running Time : 2 minutes 17 seconds
+Processor Usage    : 4 processors
