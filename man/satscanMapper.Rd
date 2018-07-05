@@ -15,6 +15,7 @@
 }
 \usage{satscanMapper( resDir      = NULL,           # no default, must be provided
                       prmFile     = NULL,           # no default, must be provided
+                      outDir      = NULL,           # default = NULL, uses value in resDir
                       
                       censusYear  = NULL,           # default = census year 2000.
                       categ       = NULL,           # default = 5
@@ -45,6 +46,18 @@
     the \option{runId} to prepend a few characters to the filenames to make them 
     unique for each \var{satscanMapper} run.
    }  
+  \item{outDir}{is the name of the directory to write the PDF graphic map file and 
+    the TXT summary report file.  Normally, the output files are written to the 
+    directory specified in the \option{resDir} parameter to keep the input and output information
+    in the same location.  However, if the output files need to be written to a different
+    directory, the \option{outDir} parameter can be used to specify the different
+    directory. If the \option{outDir} parameter is missing or \var{NULL}, the value of 
+    the \option{resDir} parameter is used as the output directory.  
+    If parameter is set to \var{""}, the current working directory will be used when the 
+    output files are written.  If the parameter is set to a
+    character string, it must be a valid/existing directory and will be used as the destination when 
+    the output files are written.    The default value is \var{NULL}.
+   }
   \item{censusYear}{This is a character value of the census year of the location IDs
     in the population and case data records or the SatScan (TM) results data files.
     The acceptable values for the censusYear parameter are "2000" and "2010".
@@ -71,7 +84,10 @@
     Future plans include allowing the caller to specify their own set of break points.
    }
   \item{title}{A character string(vector) used as the main title for the cluster
-    maps.  If no title is provided (\var{NULL} or \var{""}), the prmFile argument is used for 
+    maps.  A \var{title} may be one or two lines. If two lines, code 
+    \code{title=c("line 1", "line 2")}. 
+    for the \var{title} call parameter.  If no title is provided (\var{NULL} or \var{""}), 
+    the prmFile argument is used for 
     the main title.  The default is \var{NULL}, the package uses the prmFile argument
     as the title.
    }
@@ -288,16 +304,21 @@ Jim Pearson and Linda Pickle of StatNet Consulting, LLC, Gaithersburg, MD
 #
 #   Get location of .prm file and location to write mapping output files
 #
+#\dontrun{
+#tempdirOut <- tempdir()
+#cat("tempDirOut:",tempdirOut,"\n")
 
 SSMInstDir <- system.file(package="satscanMapper", "extdata")
+cat("SSMInstDir:",SSMInstDir,"\n")
 
 TT =c("Contiguous US States All Lung Cancer Mortality, 2004")
 
-satscanMapper(resDir=SSMInstDir,                # path to .prm file location for output files. 
-                     prmFile  = "stateLung.prm", 
-                     title    = TT          )
-
-
+satscanMapper(resDir   = SSMInstDir,                # path to .prm file location for output files. 
+              prmFile  = "stateLung.prm", 
+              outDir   = "",
+              title    = TT    
+             )
+#}
 #
 ##  end of example # 1  Removed due to time constraints.
 ##
@@ -311,16 +332,20 @@ satscanMapper(resDir=SSMInstDir,                # path to .prm file location for
 #     documented in the session saved (.prm) file.
 #
 \dontrun{
+#tempdirOut <- tempdir()
+#cat("tempDirOut:",tempdirOut,"\n")
+
 SSMInstDir <- system.file(package="satscanMapper", "extdata")
 
 TT = "Contiguous US County Female Breast Cancer Incidence, 2009-2013"
 
 satscanMapper(resDir=SSMInstDir,              # path to .prm file location for output files. 
-                     prmFile    = "inc_noadj_ellip_hilo_10_nosp.prm", 
-                     categ      = 7,
-                     title      = TT,
-                     censusYear = "2010"
-               )
+              prmFile    = "inc_noadj_ellip_hilo_10_nosp.prm", 
+              outDir     = "",
+              categ      = 7,
+              title      = TT,
+              censusYear = "2010"
+             )
 
 }
 #

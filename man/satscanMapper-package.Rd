@@ -29,8 +29,8 @@ SaTScanMapper then adds the cluster labels and outlines as requested.
     \tabular{ll}{
       Package:  \tab satscanMapper\cr
       Type:     \tab Package\cr
-      Version:  \tab 1.0.0\cr
-      Date:     \tab 2017-06-14\cr
+      Version:  \tab 1.0.1\cr
+      Date:     \tab 2018-06-30\cr
       License:  \tab GPL-2\cr
       LazyLoad: \tab no\cr
     } 

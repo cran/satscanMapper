@@ -1,7 +1,8 @@
-c58b1a8f42263f22edd34e01abb0caad *DESCRIPTION
+27e089cbd9da10174c5161671c463a6c *DESCRIPTION
 bcb841b23289d3370f8ab8683d50c8ba *NAMESPACE
+fccba72eea9a77c94f4a8b89d3163b5c *NEWS
 8f67e46882e1c6540766c6c252cee1f3 *R/CreateGeo4SS.r
-f29936c8297946c457a639cf0740e299 *R/satscanMapper.r
+d3f32c38baf04383add773a2bfb60e14 *R/satscanMapper.r
 ef237896c7889b4bee8ddc2040d2dffc *data/co99_M_data.rda
 7c0ceaa2f6826621236b55f001e9fa42 *data/co99_data.rda
 17effcb11d01e9b4abc78a36e0e0d6f3 *data/datalist
@@ -34,9 +35,9 @@ e4ccf5ffa7a6f8d767f0b361e7117b6a *inst/extdata/stateLung_output.llr.dbf
 beaa5e779ce546e27deb871b30349696 *man/co99_data.Rd
 84a0b46b009a6201edbfdf861e2f2871 *man/pl99_data.Rd
 47666d81017d58929388ffa96f62f50c *man/sa99_data.Rd
-9eb306db819efc3363cea9a627431f30 *man/satscanMapper-package.Rd
-4d8eb5a29849e68b72285113c02476aa *man/satscanMapper.Rd
-dfdfcaf53a1f46e01abe11eaadc0d4bd *man/satscanMapper.Version.Rd
+156758bba2b1b7d0d8c719802043d4cd *man/satscanMapper-package.Rd
+bd11f09d04b5f376b31a66060433ee49 *man/satscanMapper.Rd
+87bac8821709921072ff2ac2c75a3979 *man/satscanMapper.Version.Rd
 d0cc9a591e7aa48a646d544db519838a *man/st99_M_data.Rd
 7acbc59b081a06f229e74da782763f48 *man/st99_data.Rd
 06b0f23172f6632639192f88ea7f0a1d *man/tr99_M_data.Rd

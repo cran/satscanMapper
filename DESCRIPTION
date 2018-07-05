@@ -1,7 +1,7 @@
 Package: satscanMapper
 Type: Package
-Version: 1.0.0
-Date: 2017-06-14
+Version: 1.0.1
+Date: 2018-06-30
 Title: 'SaTScan' (TM) Results Mapper
 Author: Jim Pearson <jpearson@statnetconsulting.com>, with support from 'NCI'.
 Maintainer: Jim Pearson <jpearson@statnetconsulting.com>
@@ -34,6 +34,6 @@ LazyLoad: no
 BuildResaveData: best
 ByteCompile: yes
 NeedsCompilation: no
-Packaged: 2017-06-14 21:05:30 UTC; jpearson
+Packaged: 2018-07-04 19:58:11 UTC; jpearson
 Repository: CRAN
-Date/Publication: 2017-06-14 22:05:12 UTC
+Date/Publication: 2018-07-05 13:00:02 UTC

@@ -61,9 +61,16 @@ debugFlag <- FALSE
 #   17/06/10 - Fix problems with census tract reports place index
 #            - change off ODE to obs/exp in outputs.
 #            - change call parameters locODEMap and clusODEMap to locO_EMap and clusO_EMap.
-#
-#        
-# 
+#   18/06/29 - add outDir call parameter to allow output graphic and 
+#              text report files to be written a directory other than
+#              the distribution/test directory containing the SatScan(TM) 
+#              results files.  CRAN is their release testing no longer 
+#              allows a package to write to it's own release/test data
+#              directory, like the user do.  An alternate directory 
+#              must be provided to allow the package to pass
+#              release testing.  outDir allows no output files to be 
+#              written, write to a dedicated directory, write to 
+#              the default directory.
 # 
 iRes <- require(SeerMapper)
 if (!iRes) {
@@ -96,17 +103,19 @@ if (!iRes) {
 #  The Rate data files and mapping are options and may not be provided.  The rate data file must
 #   be located in the same directory as the result files.
 #
-#  The package relies on the SeerMapper package to contain the boundry data and mapping functions
-#   for use by this package.  Seveal tables are keep in this table complement the 
-#   SeerMapper data and must be sync'd between the package whenever boundary data is changed.
-#  satscanMapper uses the SM_GlobInit, SM_Build,  and SM_Mapper functions from SeerMapper.
-#   The call parameter validation, hatching and categorizing functions are not use.
-#  Once the boundary data is loaded (once per call to satscanMapper), it is reused
-#   for each required map.  satscanMapper will make changes to the SeerMapper
-#   structures (rPM and MV) to effect the changes and then call SM_Mapper to do the mapping
-#   on a single page.  SM_Mapper returns the x-limit and y-limit plot values
-#   used to permit satscanMapper to overlay additional labels, circles, ellipses, etc.
-#   accurately on the map.
+#  The package relies on the SeerMapper package to contain the boundry data 
+#   and mapping functions for use by this package.  Several tables are keep 
+#   in this table complement the SeerMapper data and must be sync'd between 
+#   the package whenever boundary data is changed.
+#  satscanMapper uses the SM_GlobInit, SM_Build,  and SM_Mapper functions from 
+#   SeerMapper. The call parameter validation, hatching and categorizing 
+#   functions are not use.
+#  Once the boundary data is loaded (once per call to satscanMapper), it is 
+#   reused for each required map.  satscanMapper will make changes to the 
+#   SeerMapper structures (rPM and MV) to effect the changes and then call 
+#   SM_Mapper to do the mapping on a single page.  SM_Mapper returns the 
+#   x-limit and y-limit plot values used to permit satscanMapper to overlay 
+#   additional labels, circles, ellipses, etc. accurately on the map.
 #
 ########################################################
 #
@@ -279,7 +288,7 @@ RateCutAdj <- function(brkpt)
 # Set Version String for build...
 #
 
-SSMVersion <- "SaTScanMapper V1.0.0 - built 170609 at 11:35am"
+SSMVersion <- "SaTScanMapper V1.0.1 - built 1806030 at 06:08am"
    
 #
 # function to get version information
@@ -303,6 +312,7 @@ satscanMapper.Version <- function() {
 #
 # resDir    <- NULL
 # prmFile   <- NULL  
+# outDir    <- NULL
 # censusYear<- NULL
 #
 # categ     <- 5
@@ -313,8 +323,10 @@ satscanMapper.Version <- function() {
 # bndyCol   <- "grey50"  
 # label     <- TRUE
 # outline   <- TRUE
+# proj4     <- NULL
 # locO_EMap <- TRUE 
 # clusO_EMap<- TRUE
+# palColors <- NULL
 #
 #
 #####
@@ -325,6 +337,7 @@ satscanMapper.Version <- function() {
 #
 # resDir    <- "c://projects//statnet//SatScan-R//NCIData//" 
 # prmFile   <- "Two circular 1year"
+# outDir    <- NULL
 # categ     <- 5
 # title     <- ""
 
@@ -334,14 +347,17 @@ satscanMapper.Version <- function() {
 # bndyCol   <- "grey50"
 # label     <- TRUE
 # outline   <- TRUE
+# proj4     <- NULL
 # locO_EMap <- TRUE
 # clusO_EMap<- TRUE
+# palColors <- NULL
 #
 
 #####  ellipse
 #
 # resDir    <- "c://projects//statnet//SatScan-R//NCIData//" 
 # prmFile   <- "ellipse" 
+# outDir    <- NULL
 # report    <- TRUE
 # runId     <- "01"
 # pValue    <- 0.05
@@ -350,8 +366,10 @@ satscanMapper.Version <- function() {
 # bndyCol   <- "grey50"
 # label     <- TRUE
 # outline   <- TRUE
+# proj4     <- NULL
 # locO_EMap <- TRUE
 # clusO_EMap<- TRUE
+# palColors <- NULL
 #
 
 ######
@@ -359,6 +377,8 @@ satscanMapper.Version <- function() {
 
 satscanMapper <- function (resDir       = NULL,           # Required
                            prmFile      = NULL,           # Required
+                           
+                           outDir       = NULL,           # Optional (default = NULL)
                           
                            censusYear   = NULL,           # Optional (default = "2000")
                            categ        = NULL,           # Optional (default = 7) 
@@ -380,20 +400,30 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #
    #  File Directories and Names
    #
-   #    resDir = Name of directory ending in "//" the contains the .prm saved session file.
+   #    resDir = Name of directory ending in "//" the contains the .prm saved 
+   #           session file.
    #           Any reports will also be written to this directory. 
    #           Required and must be a character string
    #
-   #    prmFile = the filename of the .prm file.  If .prm is ommited, it is appended to the filename.
+   #    prmFile = the filename of the .prm file.  If .prm is ommited, 
+   #           it is appended to the filename.
    #           Required and must be a character string.
    #
-   #    pValue = is a numerical value to be used for the significant test.  It must range
-   #           from 0.001 to 1.  The default value is 0.05.  This value is used to determine which
-   #           clusters identified by SaTScan (TM) should be mapped.  Only cluster with pValues <
+   #    outDir = the name of the directory to write the PDF graphics map 
+   #           file and the TXT summary file. Parameter is optional.  If not 
+   #           specified, the resDir value is used.  If outDir="", the current 
+   #           work directory is used. Otherwise the outDir value must 
+   #           be an valid/existing directory.
+   #
+   #    pValue = is a numerical value to be used for the significant test.  
+   #           It must range from 0.001 to 1.  The default value is 0.05.  
+   #           This value is used to determine which clusters identified by 
+   #           SaTScan (TM) should be mapped.  Only cluster with pValues <
    #           this parameter are mapped.
    #
-   #    report = is a logical value.  If TRUE, the package generates a text report of the calculations 
-   #           and numerical information from SaTScan (TM) related to the clusters and locations.
+   #    report = is a logical value.  If TRUE, the package generates a text 
+   #           report of the calculations and numerical information from 
+   #           SaTScan (TM) related to the clusters and locations.
    #           If FALSE, no report is created.  The default value is TRUE.
    #
    #    runId = is a character string that is appended to the result files basename when creating 
@@ -408,53 +438,86 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #           The valid range is 3 to 9.  
    #           The default is 5.
    #
-   #    locO_EMap = is a logical variable.  If TRUE, the package will create the mapping of the results 
-   #           using the Location Obs/Exp ratio data for categorization and coloring of the areas.
-   #           If FALSE, the mapping of the Location Obs/Exp ratio data will not be done.
-   #           Note: One of the locO_EMAP or clusO_EMap call parameters must be set TRUE.
+   #    locO_EMap = is a logical variable.  If TRUE, the package will create 
+   #           the mapping of the results using the Location Obs/Exp ratio data 
+   #           for categorization and coloring of the areas. If FALSE, the 
+   #           mapping of the Location Obs/Exp ratio data will not be done.
+   #           Note: One of the locO_EMAP or clusO_EMap call parameters must 
+   #           be set TRUE.
    #           Default is TRUE.
    #
-   #    clusO_EMap = is a logical variable. If TRUE, the package will create the mapping of the results
-   #           using the Cluster Obs/Exp ratio data for categorization and coloring of the areas.
-   #           If FALSE, the mapping of the Location Obs/Exp ratio data will not be done.
-   #           Note: One of the locO_EMAP or clusO_EMap call parameters must be set TRUE.
-   #           Default is TRUE.
+   #    clusO_EMap = is a logical variable. If TRUE, the package will create 
+   #           the mapping of the results using the Cluster Obs/Exp ratio data 
+   #           for categorization and coloring of the areas.
+   #           If FALSE, the mapping of the Location Obs/Exp ratio data will 
+   #           not be done.
+   #           Note: One of the locO_EMAP or clusO_EMap call parameters must 
+   #           be set TRUE.  Default is TRUE.
    #
-   #    title = is a character vector of only 1 element to be used as the title for the Cluster Maps.  
-   #           If value is "NULL" or empty (""), the prmFile file name will be will be used as the 
-   #           title.   At this time, the second title position is used to identify the legend or 
-   #           specific map charateristics.
+   #    title = is a character vector of 1 or 2 element to be used as the title 
+   #           for the Cluster Maps.  If value is "NULL" or empty (""), 
+   #           the prmFile file name will be will be used as the title.   
+   #           At this time, the second title position is used to identify 
+   #           the legend or specific map charateristics.
    #
-   #    label = is a logical variable. If set to TRUE, the package will display cluster number 
-   #           next to the cluster outline (circle or ellipse) on the each map.
+   #    label = is a logical variable. If set to TRUE, the package will display 
+   #           cluster number next to the cluster outline (circle or ellipse) 
+   #           on the each map.  The default value is TRUE.
+   #
+   #    outline = is a logical variable. If set to TRUE, the package display 
+   #           an circle or ellipse around the center of each cluster on the maps.
    #           The default value is TRUE.
    #
-   #    outline = is a logical variable. If set to TRUE, the package display an circle or ellipse 
-   #           around the center of each cluster on the maps.
-   #           The default value is TRUE.
+   #    proj4  = specifies the proj4 projection parameters to be used when 
+   #           the output maps are drawn.  
+   #           If set to NULL or "", no transformation is made to the boundary 
+   #           data when the maps are drawn.  If proj4 parameter is a "string", 
+   #           it must be a set of valid proj4 parameters.  The proj4 parameter 
+   #           is passed to SeerMapper to transform the projection of the drawn maps. 
+   #           By default the map projection is:
+   #           CRS("+proj=aea +lat_1=33 +lat_2=45 +lat_0=39 +lon_0=96w +units=m")
    #
-   #    bndyCol = is a character vector reprecenting a color.  The border color to use when 
-   #           mapping area boundaries in Cluster Maps.  This color is not used when boundaries 
-   #           are drawn for higher level areas. The value must be a valid  color as listed by 
+   #    bndyCol = is a character vector reprecenting a color.  The border 
+   #           color to use when mapping area boundaries in Cluster Maps.  
+   #           This color is not used when boundaries are drawn for higher 
+   #           level areas. The value must be a valid  color as listed by 
    #           the R "colors()" function.  
-   #           The default is "grey50", the global value is set via the internal variable CTBorder.
-   #           To disable the mapping of the borders, set bndyCol option to "NA".
+   #           The default is "grey50", the global value is set via the 
+   #           internal variable CTBorder.  To disable the mapping of the 
+   #           borders, set bndyCol option to "NA".
    #
-   #    censusYear = is a character vector representing the census year of the location IDs.
-   #           This is important to make sure the boundary data matches the location FIPS codes
-   #           used in the cluster analysis and the mapping.  This package supports
-   #           the census years of "2000" and "2010".  The default value is "2000".
+   #    censusYear = is a character vector representing the census year of 
+   #           the location IDs.  This is important to make sure the 
+   #           boundary data matches the location FIPS codes used in the 
+   #           cluster analysis and the mapping.  This package supports
+   #           the census years of "2000" and "2010".  
+   #	       The default value is "2000".
+   #
+   #    palColors = is the name from RColorBrewer of the color palette 
+   #           for the mapping.  This replaces the default value of "-RdYlBu".  
+   #           The use of the "-" at the beginning of the name requests 
+   #           the color palette be reversed.  See RColorBrewer for the 
+   #           valid list of palette names.
    #    
    #
-   #  Need to Add:   palColors, ReportTier - 1 to 4, Options for passing to SeerMapper.
+   #  Need to Add:  ReportTier - 1 to 4, Options for passing to SeerMapper.
+   #
    ####
 
    #####
    #
    #   Local Functions
    #
+
+   ####
+   #
+   #   Validate location IDs and set the Loc type.  (2, 5, 11 and now 3 HSA)
+   #
+   #   Upgraded to handle HSA location ID determination and conflict with state FIPS IDs.
+   #
    CleanLocID <- function(xTable) {   
       # assume it's FIPS - 2, 5, or 11 digits (goal)
+
       ErrFnd         <- FALSE
       xTable$LOC_ID  <- str_trim(as.character(xTable$LOC_ID))   # convert from factor to character
       
@@ -510,8 +573,8 @@ satscanMapper <- function (resDir       = NULL,           # Required
       
       return (list(Table=xTable,IDType=xIDType,LocList=xLocList,StateList=xStateList,Err=ErrFnd))
    }
-
- 
+   
+   
    
    #   End of CleanLocID
    #
@@ -549,6 +612,13 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #cat("Default path:",getwd(),"\n")
    
    #
+   #  Temp - Variables
+   #
+   proj4     <- NULL
+   CRSproj4  <- NULL
+   palColors <- NULL
+      
+   #
    #  bndyCol Colors
    #
    
@@ -572,11 +642,14 @@ satscanMapper <- function (resDir       = NULL,           # Required
    RateMapping  <- FALSE      # enable Rate Mapping map generation
    NoRRFile     <- FALSE      # no RR file, work around it.
    
+   DoOutput     <- TRUE       # Output control flag - TRUE do output.
+   
    PrmFileName  <- NULL          # PRM file name (dir, results file, extension)
    ColFileName  <- NULL          # Cluster Info file name (dir, results file, extension)
    GisFileName  <- NULL          # Location Info file name
    RRFileName   <- NULL          # RR file name
    RateFileName <- NULL          # Rate data file name
+   outDirName   <- NULL          # Output Report/File Directory
    
    L2Off        <- FALSE
    
@@ -640,6 +713,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
    vHOMEDir    <- paste0(getwd(),"/")
    vEXTDATADir <- paste0(system.file(package="satscanMapper","extdata"),"/")
    vRESDIR     <- paste0(getwd(),"/")
+   vOUTDIR     <- vRESDIR
    
    #####
    #
@@ -654,8 +728,9 @@ satscanMapper <- function (resDir       = NULL,           # Required
        NumErrors  <- NumErrors + 1
        xmsg       <- paste0("The required resDir= call argument has not been provided.")
        warning(xmsg,call.=FALSE)
+   } else {
+       resDir <- as.character(resDir[[1]][1])
    }
-   
    #
    #  prmFile =
    #
@@ -664,28 +739,55 @@ satscanMapper <- function (resDir       = NULL,           # Required
        NumErrors  <- NumErrors + 1
        xmsg       <- paste0("The required prmFile= parameter has not been provided.")
        warning(xmsg,call.=FALSE)
+   } else {
+       prmFile <- as.character(prmFile[[1]][1])
    }
    
-   #  clean up path and file name strings - replace "\\" with "/"  (Windows to Unix style format)
-   resDir  <- gsub("[\\]","/",resDir)
-   prmFile <- gsub("[\\]","/",prmFile)
+   #
+   #  outDir = 
+   #
+   if (is.null(outDir) ) {  # outDir is NULL 
+      outDir   <- resDir    # use resDir as the default value.
+   }
+   if (is.na(outDir) )   {  # outDir is NA - no output - special case
+      outDir   <- NA        # special case.
+      DoOutput <- FALSE
+   } else {
+      outDir   <- as.character(outDir[[1]][1])
+      # must be a character string
+      outDir   <- str_trim(outDir)    # trim leading and trailing blanks.
+      if ( outDir == "" ) {     # outDir is an empty string "" - set to the current getwd() value.
+         # if value is ""   use current working directory
+         outDir <- getwd()
+      }
+   }
+   #  All values are now character strings.  
+   #     Other structures and factors have been eliminated.
+   
+   #  Clean up path and file name strings - replace "\\" with "/"  
+   #             (Windows to Unix style format)
    
    # determine if resDir ends with "/" or "\\".  If it doesn't add "/".
    #   Note "\\" turns into a single "\", but shows up as one character "\\"
-   
+ 
+   resDir  <- gsub("[\\]","/",resDir)
    if (str_sub(resDir,-1) != "\\" && str_sub(resDir,-1) != "/")  {
        # resDir does not end with "\\" or "/", add one.
        resDir <- paste0(resDir, "/")
    }
-     
+   # process path substitutions variables (%HOME%/ and %EXTDATA%/)
    resDir  <- sub("^%HOME%/",   vRESDIR,    resDir)
    resDir  <- sub("^%EXTDATA%/",vEXTDATADir,resDir)
+
    vRESDIR <- resDir
     
+   # prmFile checks 
    # determine if .prm is at the end of the prmFile parameter
-   orgPrmFile   <- prmFile
-   baseDataFN   <-  sub("[.][^.]*$", "", prmFile,perl=TRUE)
-     
+   orgPrmFile    <- prmFile
+   baseDataFN    <-  sub("[.][^.]*$", "", prmFile,perl=TRUE)
+  
+   prmFile <- gsub("[\\]","/",prmFile)
+   
    if (toupper(str_sub(prmFile,-4,-1)) != ".PRM") {
        # not ending in .prm - add it.
        prmFile <- paste0(prmFile,".prm")
@@ -714,8 +816,28 @@ satscanMapper <- function (resDir       = NULL,           # Required
           warning(xmsg,call.=FALSE)
        }
    }
+
+   if (DoOutput) {
+      outDir  <- gsub("[\\]","/",outDir)
+      if (str_sub(outDir,-1) != "\\" && str_sub(outDir,-1) != "/")  {
+          # outDir does not end with "\\" or "/", add one.
+          outDir <- paste0(outDir, "/")
+      }
+      # process path substitutions variables (%HOME%/ and %EXTDATA%/)
+      outDir  <- sub("^%HOME%/",   vRESDIR,    outDir)
+      outDir  <- sub("^%EXTDATA%/",vEXTDATADir,outDir)
+      if (!dir.exists(outDir)) {
+          # resDir option directory does not exist
+          FNDError    <- TRUE
+          NumErrors   <- NumErrors + 1
+          xmsg        <- paste0("The directory specified by the outDir argument does not exist :",resDir," ")
+         warning(xmsg,call.=FALSE)
+      }
+   }
+   vOUTDIR <- outDir
    
-   # if the resDir and prmFile arguments are not provide or are wrong, we have to stop
+   # if the resDir and prmFile and outDir arguments are not provide or are wrong, 
+   #   we have to stop
    
    if (FNDError) {
       xmsg <- paste0("Call argument errors found - execution stopped.")
@@ -749,18 +871,22 @@ satscanMapper <- function (resDir       = NULL,           # Required
    # resDir is the base directory for the results
    # baseDataFN is the base filename from the .prm file
    # prmFilel is the full filename and ext for the .prm
-   
+   # outDir is the base directory for writing the output.
+
    callVarList$resDir       <- resDir
    callVarList$prmFile      <- prmFile
+   callVarList$outDir       <- outDir
    callVarList$wPrmFileName <- wPrmFileName
    callVarList$baseDataFN   <- baseDataFN
    
    vRESDIR                  <- resDir
+   vOUTDIR                  <- outDir
    
    #cat("results Dir   :",resDir,"\n")
    #cat(".prm File     :",prmFile,"\n")
    #cat(".prm path&name:",wPrmFileName,"\n")
    #cat("base filename :",baseDataFN,"\n")
+   #cat("output Dir    :",outDir,"\n")
    
    #
    #  end of resDir and prmFile validation checks
@@ -848,22 +974,36 @@ satscanMapper <- function (resDir       = NULL,           # Required
    vTitle <- ""
    if (is.null(title)) {
       # no title argument provided
-      vTitle <- orgPrmFile
+      vTitle      <- orgPrmFile
    
    } else {
-      if (is.na(title) || !is.character(title) || nchar(title) <= 0 ) {
+      if (is.na(title) || !is.character(title) || nchar(title) <= 0 || length(title) <= 0) {
          # title is set to NA, not a character vector or empty.
-         xmsg     <- paste0("The title call argument is NA, a non-character string, or empty.\n",
+         xmsg     <- paste0("The title call argument is NA, a non-character string, a non-vector, or empty.\n",
                 "The title is set to the prmFile name of ",prmFile,"\n")
          warning(xmsg,call.=FALSE)
          NumWarns <- NumWarns + 1
          vTitle   <- orgPrmFile
       } else {
-         vTitle   <- title[[1]][1]
+         if (!is.vector(title)) {
+            xmsg <- paste0("The title call argument is must be a vector of strings for multiple line titles.\n",
+                  "The title is set to the prmFile name of ",prmFile,"\n")
+                
+            warning(xmsg,call.=FALSE)
+            NumWarns <- NumWarns + 1
+            vTitle   <- orgPrmFile
+         } else {
+           title <- as.character(title)
+           if (length(title) > 2) {
+              title <- title[1:2]   # only take first two
+           } else {
+              title <- title[[1]][1]
+           }
+         }
+         vTitle <- title
       }
    }
    callVarList$title <- vTitle
-   title             <- vTitle
 
    #
    # label   
@@ -951,6 +1091,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
       # no call argument provides
       categ   <- categ_Def   # set to the default.
    } else {
+      categ <- as.integer(categ[[1]][1])
       if ( is.na(categ) || categ < 3 || categ > 9) {
         # categ call argument is set to NA or out of range.
         xmsg     <- paste0("The categ call argument is set to NA or is out of range ( < 3 or > 9). \n",
@@ -1011,12 +1152,12 @@ satscanMapper <- function (resDir       = NULL,           # Required
    
    # Check to make sure one was set.
    
-   if (!locO_EMap && !clusO_EMap) {
-      xmsg    <-  paste0("Both locO_EMap and clusO_EMap have been set to FALSE.  No map will be drawn in this situation.  Both parameters have been se to TRUE.")
-      warning(xmsg, call.=FALSE)
-      locO_EMap  <- TRUE
-      clusO_EMap <- TRUE
-   }
+   #if (!locO_EMap && !clusO_EMap) {
+   #   xmsg    <-  paste0("Both locO_EMap and clusO_EMap have been set to FALSE.  No map will be drawn in this situation.  Both parameters have been se to TRUE.")
+   #   warning(xmsg, call.=FALSE)
+   #   locO_EMap  <- TRUE
+   #   clusO_EMap <- TRUE
+   #}
    
    #
    #
@@ -1088,7 +1229,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
    }
 
    #
-   # End resDir, prmFile and call argument processing and verification.
+   # End resDir, prmFile, outDir and call argument processing and verification.
    #
    ###########################################################
 
@@ -1102,25 +1243,39 @@ satscanMapper <- function (resDir       = NULL,           # Required
    
    
    PrmChkN <- c(               # PRM file parameter (field) names
-      "CaseFile"                    # Case file path/filename
-     ,"PopulationFile"              # Population file path/filename
-     ,"CoordinatesFile"             # Coordinates file path/filename
+      "CaseFile"                    # nu Case file path/filename
+     ,"PopulationFile"              # nu Population file path/filename
+     ,"CoordinatesFile"             # nu Coordinates file path/filename
+     
      ,"PrecisionCaseTimes"          # 0=None, 1=Year, 2=Month, 3=Day, 4=Generic (1)
      ,"CoordinatesType"             # 0=Cartesian 1=Lat/Long  (0, 1)
      ,"StartDate"                   # a date (-1)              
      ,"EndDate"                     # a date (-1)
-     ,"AnalysisType"                # 1=Purely Spatial, 2=Purely Temporal(No) 3=Retrospective ST 
-                                    # 4=Prospective ST, 5=Spatial Var. in Temporal Trends (No), 6=Prospective Purely Temporal (No)
+     ,"AnalysisType"                # 1=Purely Spatial, 
+                                    # nu 2=Purely Temporal(No) 
+                                    # 3=Retrospective ST 
+                                    # 4=Prospective ST, 
+                                    # nu 5=Spatial Var. in Temporal Trends (No), 
+                                    # nu 6=Prospective Purely Temporal (No)
                                     #   1, 3, and 4 are acceptable  
-     ,"ModelType"                   # 0=Discrete Poisson, 1=Bernoulli, 2=Space-Time Permutation, 3=Ordinal, 4=Exponential, 5=Normal, 6=Continuous Poisson, 7=Multinomial
+  
+     ,"ModelType"                   # 0=Discrete Poisson, 
+                                    # 1=Bernoulli, 
+                                    # 2=Space-Time Permutation, 
+                                    # nu 3=Ordinal, 
+                                    # 4=Exponential, 
+                                    # nu 5=Normal, 
+                                    # 6=Continuous Poisson, 
+                                    # nu 7=Multinomial
+                                    
      ,"TimeAggregationUnits"        # 0=None, 1=Year, 2=Month, 3=Day, 4=Generic  (1)
      ,"TimeAggregationLength"       # (Positive Integer) in above units. (-2)  (0 to n)
      ,"ResultsFile"                 # Base Filename - string (-3)  (text file)
-     ,"IncludeRelativeRisksCensusAreasDBase" # Must be "y" 
-     ,"CensusAreasReportedClustersDBase"     # Must be "y"
-     ,"MostLikelyClusterEachCentroidDBase"   # Must be "y"
-     ,"MostLikelyClusterCaseInfoEachCentroidDBase"
-   
+     ,"IncludeRelativeRisksCensusAreasDBase" # Must be "y" (RR)
+     ,"CensusAreasReportedClustersDBase"     # Must be "y" (Cluster)
+     ,"MostLikelyClusterEachCentroidDBase"   # Must be "y" (location)
+     ,"MostLikelyClusterCaseInfoEachCentroidDBase"   # nu
+
      ,"SpatialWindowShapeType"      # 0=Circular, 1=Elliptic   - either are acceptable
      ,"MaxTemporalSize"             # Max temporal size of cluster over time, positive integer (-2) (???) 
      ,"Version"                     # Versions - match on first character in case of sub-releases.                  
@@ -1852,11 +2007,6 @@ satscanMapper <- function (resDir       = NULL,           # Required
    Save_Width <- getOption("width")
       options(width=200)
    
-   categ  <- as.integer(categ)
-   if (categ < 3) categ <- 3
-   if (categ > 11) categ <- 11
-   #### should be handled at parameter check...
-   
    #
    #  FUTURE with palColors implemented - categ must be checked against the number
    #    of colors available.
@@ -1864,6 +2014,8 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #  FUTURE allow caller to specify the break point value list. 
    #
    
+   #####
+   #
    #  Break point lists for categorizations.
    #
    #BreakListOE <- c(-1, 0.33, 0.4, 0.5, 0.67, 0.9, 1.1, 1.5, 2.0, 2.5, 3.0, 999999)         #  US O/E breakpoint list for Obs_Exp (0 to > 2.0)
@@ -1923,18 +2075,273 @@ satscanMapper <- function (resDir       = NULL,           # Required
    ColorsB_Clus_High <- ColorsB_Clus_Full[11]
    
    #
+   #  Posible change to use high and low values in maps.
+   #
+   
+   #
    ####
+   
+   ####
+   #
+   #  Load information structures for State, State/HSA, State/County, State/County/Census Tract
+   #   and complete build of any of the index tables.
+   #
+   #   Get state, HSA, county and census tract location ID information 
+   #    for census years 2000 and 2010.  As of v1.0.0 we don't deal
+   #    boundary files any longer.
+   #
+   st99_data <- NULL
+   hs99_data <- NULL
+   co99_data <- NULL
+   tr99_data <- NULL
+   pl99_data <- NULL
+   
+   #  Step 1 - load index structures.
+   
+   #  Initialize - make sure old structures are GONE.
+   #
+   if (debugFlag) {
+      ldir <- "c:/projects/statnet/r code/satscanMapper-1.0.0/data/"
+      st99FN <- paste0(ldir,"st99_data.rda")
+      #hs99FN <- paste0(ldir,"hs99_data.rda")
+      co99FN <- paste0(ldir,"co99_data.rda")
+      pl99FN <- paste0(ldir,"pl99_data.rda")   # load only if tr level data 
+      tr99FN <- paste0(ldir,"tr99_data.rda")   # load only if tr level data  
+      #
+      load(file=st99FN)
+      #load(file=hs99FN)
+      load(file=co99FN)
+      load(file=pl99FN)
+      load(file=tr99FN)
+   } else {
+      data(st99_data,envir = environment(),package="satscanMapper")
+      #data(hs99_data,envir - environment(),package="satscanMapper")
+      data(co99_data,envir = environment(),package="satscanMapper")
+      data(pl99_data,envir = environment(),package="satscanMapper")
+      data(tr99_data,envir = environment(),package="satscanMapper")
+   }
+   
+   #cat("data sets loaded for satscanMapper Z-2117 .\n")
   
+   #
+   #  The above loads the three working table indexes:
+   #        st99_data   (State Fips to literals)
+   #        hs99_data   (HSA numbers to literals)
+   #        co99_data   (State/County Fips to literals)
+   #        pl99_data   (State/County/Place to literals, used with tract data)
+   #        tr99_data   (State/County/Census Tract Fips to literals ???)
+   #
+   #    Both the county and census tract index will be edited to only the required states.
+   #
+
    ########
    #
-   #  The cartesian coordinates provided in the data files most have the 0,0 point 
-   #    as the center of the continental US - NOT Lat = 0, Long = 0.
-   #    Geographic Center of US - Lat 39 50  Long -98 35
-   #    ESRI's projection is Equidistance Conic with center of Lat 39 degrees and 
-   #    Long -96 degrees.
+   #  The cartesian coordinates or Lat/Long in the results files cannot be 
+   #    used. We have no way of knowing the units, projection, or origin
+   #    of the coordinates.  Instead, the package will key on the 
+   #    Location IDs in the results and match them to our own
+   #    boundaries and centroid coordinates.  It also allows us to 
+   #    change the projection on request.  Our default is Albers Equal Area
+   #    centered on the continental US.
    #
    ########
    
+   # 
+   #    census year filter = 2000 -> 1    2010 -> 2
+   #
+   yF   <- 1
+   
+   if (censusYear == "2010")  yF <- 2
+   
+   #cat("Set up st99.index structure for run Z- .\n")
+   
+   st99.index       <- st99_data
+   st99.index$ID    <- row.names(st99.index)
+   st99.index$stID  <- as.character(st99.index$ID)
+   #stAllList       <- st99.index$stID
+      
+   #cat("st99.index updated - Z-2167 \n")
+   #print(st99.index)
+   
+   
+   #
+   # st99.index fields
+   #    row.names -> 2 digit state FIPS
+   #    $abbr
+   #    $stName
+   #    $rgID
+   #    $rgName
+   #    $dvID
+   #    $dvName
+   #    $loc
+   #    $hsa_00
+   #    $hsa_10
+   #    $county_00
+   #    $county_10
+   #    $tract_00
+   #    $tract_10
+   #    $change10
+   #    $c_X
+   #    $c_Y
+   #  added:    
+   #    $ID
+   #    $stID
+   #    $scale
+   #
+   #    $use
+   #
+   
+   
+   #cat("Set up hs99.index structure for run.\n")
+    
+   #hs99.index         <- hs99_data
+   #hs99.index$ID      <- row.names(hs99.index)
+   #hs99.index$HSAID   <- hs99.index$ID
+   #hs99.index$stID    <- as.character(hs99.index$stID)
+   #hs99.index$stName  <- as.character(hs99.index$stName)
+   #hs99.index$saID    <- as.character(hs99.index$saID)
+   #hs99.index$hsaName <- as.character(hs99.index$hsaName)
+   
+   #hsAllList        <- hs99.index$ID
+
+   #
+   # hs99.index fields
+   #    row.names  -> 3 digit HSA number
+   #    $hsaName
+   #    $stID
+   #    $stName
+   #    $county_00
+   #    $county_10
+   #    $tract_00
+   #    $tract_10
+   #    $change10
+   #    $c_X_00
+   #    $c_Y_00
+   #    $c_X_10
+   #    $c_Y_10
+   #  added:  
+   #    $ID
+   #
+   #
+
+   #cat("Set up co99.index structure for run.\n")
+    
+   co99.index       <- co99_data
+   co99.index$ID    <- row.names(co99.index)
+   co99.index$stcoID<- co99.index$ID
+   co99.index$stID  <- as.character(co99.index$stID)
+   co99.index$stName<- as.character(co99.index$stName)
+   co99.index$saID  <- as.character(co99.index$saID)
+   
+   co99No           <- str_sub(co99.index$ID,3,5) == "000"
+   co99.index       <- co99.index[!co99No,]
+   
+   #coAllList        <- co99.index$ID
+   
+   #
+   # co99.index fields
+   #    $stID
+   #    $stName
+   #    $coName
+   #    $saID
+   #    $c_X_00
+   #    $c_Y_00
+   #    $c_X_10
+   #    $c_Y_10
+   #    $tracts_00
+   #    $tracts_10
+   #    $y
+   #
+   #    $ID
+   #
+   #    $ID
+   #    $stID
+   #    $stName
+   #    $saID
+   #    $hsaID
+   #    $hsaName
+   #    $stcoID
+   #
+   
+   #
+   #  edit tables to only have data for the selected census year.
+   #   Setup co99.index based on StateListDAll from Clus, Gis, RR tables
+   #
+   
+   #cat("Set up pl99.index structure for run.\n")
+   
+   pl99.index       <- pl99_data
+   pl99.index$ID    <- row.names(pl99.index)
+   pl99.index$stID  <- str_sub(pl99.index$stcoID,1,2)
+   #plAllList        <- pl99.index$ID
+   
+   #
+   #  pl99.index fields
+   #     $stcoID
+   #     $plName
+   #     $tracts_00
+   #     $tracts_10
+   #
+   #     $ID
+   #     $stID 
+   #
+   
+   #cat("Set up tr99.index structure for run.\n")
+   
+   tr99.index       <- tr99_data
+   tr99.index$ID    <- row.names(tr99.index)
+   tr99.index$stID  <- str_sub(tr99.index$ID,1,2)
+   tr99.index$stcoID<- str_sub(tr99.index$ID,1,5)
+   #trAllList        <- tr99.index$ID
+   
+   tr99.index$stAbbr<- st99.index[tr99.index$stID,"abbr"]
+   tr99.index$stName<- st99.index[tr99.index$stID,"stName"]
+   tr99.index$coName<- co99.index[tr99.index$stcoID,"coName"]
+   
+   tr99.index$plName <- str_sub(tr99.index$plKey,6)
+   
+   # 
+   #  tr99.index fields
+   #    $stID
+   #    $plKey
+   #    $c_X_00
+   #    $c_Y_00
+   #    $c_X_10
+   #    $c_Y_10
+   #    $y
+   #    
+   #    $ID
+   #    $hsaID
+   #    $stcoID
+   #    $stAbbr
+   #    $stName
+   #    $hsaName
+   #    $coName
+   #    $plName
+   #
+   
+   #str(st99.index)
+   #str(co99.index)
+   #str(pl99.index)
+   #str(tr99.index)
+   
+   suppressWarnings(rm(st99_data))
+   suppressWarnings(rm(co99_data))
+   suppressWarnings(rm(pl99_data))
+   suppressWarnings(rm(tr99_data))
+   
+   #
+   #  In all tables (co99 and tr99) only the states with data are included and only
+   #  the entries related to the specified census year.   xxxAllList variables 
+   #  are taken before the census year and state edit. (all IDs in data tables.)
+   #  The DI lists after the state and year edit are in xxxSelList.
+   #
+   
+   #
+   #  2000 and 2010 Census area information is loaded.
+   #
+   ####
+
    ########
    #
    #   FILES  Locations:
@@ -1949,6 +2356,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
    
    #print("Call parameters:\n")
    #print(paste("resDir           :",resDir,sep=""))
+   #print(paste0("outDir           :",outDir))
    #
    #  Set SatScan's output base filename to be used by the program - where:
    #
@@ -1974,41 +2382,46 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #
    #    Base directory and filename for any output reports or maps.
    #
-   OutputBase <- paste0(resDir,baseDataFN)
+   OutputFNBase <- ""
+   OutputFNpdf  <- ""
+   OutputFNtxt  <- ""
    
-   if (runId != "") {
-      # use runId
-      OutputFNBase <- paste0(OutputBase,"-",runId)
-      OutputFNpdf  <- paste0(OutputFNBase,".pdf")
-      OutputFNtxt  <- paste0(OutputFNBase,".txt")
-      if (file.exists(OutputFNpdf) || file.exists(OutputFNtxt)) {
-         # one of the other exists
-         xmsg      <- paste0("The pdf or txt output file using the runId of ",runId," already exists.  Change runId and retry.")
-         stop(xmsg, call.=FALSE)
-      }
-   } else {
+   if (DoOutput) {
+      OutputBase <- paste0(outDir,baseDataFN)
    
-      OutNum  <- 1
-   
-      repeat {
-         OutNumLit    <- formatC(OutNum,format="f",width=2,digits=0,flag="0")
-         OutputFNBase <- paste0(OutputBase,"-R",OutNumLit)
+      if (runId != "") {
+         # use runId
+         OutputFNBase <- paste0(OutputBase,"-",runId)
          OutputFNpdf  <- paste0(OutputFNBase,".pdf")
          OutputFNtxt  <- paste0(OutputFNBase,".txt")
-         if (!file.exists(OutputFNpdf) && !file.exists(OutputFNtxt)) {
-            # either file exists - good to go.
-            break
-         }
-         OutNum <- OutNum +  1   # look for another filename
-         if (OutNum > 99) {
-            xmsg     <- paste0("There already exists output files with -Rxx expanded names. Cannot generate graphs or reports.")
+         if (file.exists(OutputFNpdf) || file.exists(OutputFNtxt)) {
+            # one of the other exists
+            xmsg      <- paste0("The pdf or txt output file using the runId of ",runId," already exists.  Change runId and retry.")
             stop(xmsg, call.=FALSE)
          }
-      }
-   }
+      } else {
    
-   #cat("OutputFNpdf  :",OutputFNpdf,"\n")
-   #cat("OutputFNtxt  :",OutputFNtxt,"\n")
+         OutNum  <- 1
+   
+         repeat {
+            OutNumLit    <- formatC(OutNum,format="f",width=2,digits=0,flag="0")
+            OutputFNBase <- paste0(OutputBase,"-R",OutNumLit)
+            OutputFNpdf  <- paste0(OutputFNBase,".pdf")
+            OutputFNtxt  <- paste0(OutputFNBase,".txt")
+            if (!file.exists(OutputFNpdf) && !file.exists(OutputFNtxt)) {
+               # either file exists - good to go.
+               break
+            }
+            OutNum <- OutNum +  1   # look for another filename
+            if (OutNum > 99) {
+               xmsg     <- paste0("There already exists output files with -Rxx expanded names. Cannot generate graphs or reports.")
+               stop(xmsg, call.=FALSE)
+            }
+         }
+      }
+      #cat("OutputFNpdf  :",OutputFNpdf,"\n")
+      #cat("OutputFNtxt  :",OutputFNtxt,"\n")
+   }
    
    callVarList$OutputFNpdf <- OutputFNpdf
    callVarList$OutputFNtxt <- OutputFNtxt
@@ -2168,7 +2581,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
        ColHasODE <- FALSE
    }
    
-    #
+   #
    # verify ColTable required fields are present.
    #
    
@@ -2792,7 +3205,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
       xmsg      <- paste0("The LOC_IDs in the Cluster, Location and RR results files are not the same type or length.  Please correct and rerun,\n")
       stop (xmsg,call.=FALSE)
    }
-   LocIDType <- GisIDType     # 2, 5, or 11
+   LocIDType <- GisIDType     # 2, 3, 5, or 11
    
    #
    #####
@@ -2808,39 +3221,59 @@ satscanMapper <- function (resDir       = NULL,           # Required
    
    rPM       <- SeerMapper::SM_GlobInit()  # initialize Seer Mapper variable named lists.
    
-   #cat("completed SM_GlobInit Z-2711 .\n")
+   #cat("completed SM_GlobInit Z-3237 .\n")
    
    #
    #  Now we have the rPM named list to start filling in.
    #  Most of it must be done before calling SM_Build
    #
     
+   rPM$proj4          <- proj4       # save projection proj4string character string for SeerMapper
+   rPM$CRSproj4       <- CRSproj4
+   
+   rPM$palColors      <- palColors    # save palColors scheme, however the colors are passed along as the values.
+   
+   #   Set up the boundary options the way satscanMapper wants them.
    rPM$regionB        <- "NONE"
    regionB            <- "NONE"
    rPM$regionB_caller <- TRUE
+   
    rPM$stateB         <- "NONE"
    stateB             <- "NONE"
    rPM$stateB_caller  <- TRUE
+   
    rPM$seerB          <- "NONE"
    seerB              <- "NONE"
    rPM$seerB_caller   <- TRUE
+   
+   rPM$hsaB           <- "NONE"
+   hsaB               <- "NONE"
+   rPM$hsaB_caller    <- TRUE
+   
    rPM$countyB        <- "NONE"
    countyB            <- "NONE"
    rPM$countyB_caller <- TRUE
+   
    rPM$tractB         <- "NONE"
    tractB             <- "NONE"
    rPM$tractB_caller  <- TRUE
    
+   # No hatching
+   
    rPM$hatch          <- FALSE
    rPM$HatchFlag      <- FALSE   # dont do hatching
+   rPM$hatch2         <- FALSE
+   rPM$Hatch2Flag     <- FALSE
+   
+   # Legends
+   
    rPM$mLegendFlag    <- FALSE   # dont do legends
    
-   
-   #cat("Basic SeerMapper callparms set - Z-2811 - LocIDType:",LocIDType," \n")
+   #cat("Basic SeerMapper callparms set - Z-3285 - LocIDType:",LocIDType," \n")
    
    mapB               <- "STATE"  #### temp until option added.
    
-   #  parameter:   mapB <- c("DATA","COUNTY","STATE","REGION")   # default = "DATA"
+   #  parameter:   mapB <- c("DATA","COUNTY", "HSA", "STATE","REGION")   # default = "DATA"
    
    if (LocIDType == 2) {
       # state location IDs
@@ -2849,6 +3282,22 @@ satscanMapper <- function (resDir       = NULL,           # Required
           regionB <- "DATA"
           stateB  <- "REGION"
       }
+      #  mapB = "STATE", "HSA", or "COUNTY" is invalid
+   }
+   if (LocIDType == 3) {
+      # HSA location IDs (data)
+      hsaB <- "DATA"
+      if (mapB=="REGION") {
+         regionB <- "DATA"
+         stateB  <- "REGION"
+         hsaB    <- "STATE"
+      }
+      if (mapB=="STATE") {
+         regionB <- "NONE"
+         stateB  <- "DATA"
+         hsaB    <- "STATE"
+      }
+      # mapB = "HSA" or "COUNTY" is not valid.
    }
    if (LocIDType == 5) {
       # County location IDs
@@ -2856,13 +3305,22 @@ satscanMapper <- function (resDir       = NULL,           # Required
       if (mapB=="REGION") {
          regionB  <- "DATA"
          stateB   <- "REGION"
+         hsaB     <- "STATE"
          countyB  <- "STATE"
       }
       if (mapB == "STATE") {
          regionB  <- "NONE"
          stateB   <- "DATA"
+         hsaB     <- "STATE"
          countyB  <- "STATE"
       }
+      if (mapB == "HSA") {
+         regionB  <- "NONE"
+         stateB   <- "NONE"
+         hsaB     <- "DATA"
+         countyB  <- "HSA"
+      }
+      # mapB = "COUNTY" is not valid
    }
    if (LocIDType == 11) {
       # Census Tract location IDs.
@@ -2870,18 +3328,28 @@ satscanMapper <- function (resDir       = NULL,           # Required
       if (mapB=="REGION") {
          regionB  <- "DATA"
          stateB   <- "REGION"
+         hsaB     <- "STATE"
          countyB  <- "STATE"
          tractB   <- "STATE"
       }
       if (mapB == "STATE") {
          regionB  <- "NONE"
          stateB   <- "DATA"
+         hsaB     <- "STATE"
          countyB  <- "STATE"
          tractB   <- "STATE"
+      }
+      if (mapB == "HSA") {
+         regionB  <- "NONE"
+         stateB   <- "NONE"
+         hsaB     <- "DATA"
+         countyB  <- "HSA"
+         tractB   <- "COUNTY"
       }
       if (mapB == "COUNTY") {
          regionB  <- "NONE"
          stateB   <- "NONE"
+         hsaB     <- "NONE"
          countyB  <- "DATA"
          tractB   <- "COUNTY"
       }
@@ -2892,13 +3360,13 @@ satscanMapper <- function (resDir       = NULL,           # Required
    rPM$regionB    <- regionB
    rPM$stateB     <- stateB
    rPM$seerB      <- seerB
+   rPM$hsaB       <- hsaB
    rPM$countyB    <- countyB
    rPM$tractB     <- tractB
    
    #
    #####
-   
-    
+       
    #####
    #
    #  Loc IDs must be validated against the boundary database.  The placename table for 
@@ -2912,7 +3380,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #
    #  We have the ClusLocList, GisLocList, and RRLocList to compare.
    #
-   #cat("Setup state and location lists - Z-2820 \n")
+   #cat("Setup state and location lists - Z-3400 \n")
       
    StateListDAll  <- sort(unique(c(ColStateList,GisStateList,RRStateList)))
    StateListData  <- sort(unique(c(ColStateList,GisStateList)))
@@ -2948,7 +3416,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
    
    idList          <- LocListDAll                   # all Loc_IDs from Cluster, Loc and RR files.
    lenIdList       <- length(idList)
-   #cat("Number of Locations IDs found Z-2928 :",lenIdList,"\n")
+   #cat("Number of Locations IDs found Z-3432 :",lenIdList,"\n")
    
    dataList        <- rep("white",length(idList))
    hDataList       <- rep(NA,length(idList))
@@ -2963,19 +3431,20 @@ satscanMapper <- function (resDir       = NULL,           # Required
    dataMapDF$rgID     <- cNA       # region ID
    dataMapDF$stID     <- cNA       # state  ID
    dataMapDF$saID     <- cNA       # Seer Registry ID
-   dataMapDF$haID     <- cNA       # health district ID
+   dataMapDF$hsaID    <- cNA       # health district ID
    dataMapDF$stcoID   <- cNA       # state/county ID
    dataMapDF$stcotrID <- cNA       # state/county/tract ID
    dataMapDF$plName   <- cNA       # place Name
    dataMapDF$cat      <- 0         # data category #
    dataMapDF$col      <- "white"   # color
-   dataMapDF$hRes     <- FALSE     # hatching T/F  (test results) - does sub-area get hatched?
-   dataMapDF$hCol     <- "grey50"  # hatching color
    dataMapDF$hDen     <- as.integer(NA)  # hatching density
+   dataMapDF$hCol     <- "grey50"  # hatching color
+   dataMapDF$hRes     <- FALSE     # hatching T/F  (test results) - does sub-area get hatched?
+   dataMapDF$hRes2    <- FALSE     # hatching T/F  (test results) - does sub-area get hatched?
    
    row.names(dataMapDF) <- dataMapDF$ID
 
-   #cat("dim(dataMapDF) Z-2955 :",dim(dataMapDF),"\n")
+   #cat("dim(dataMapDF) Z-3460 :",dim(dataMapDF),"\n")
    
    #cat("dataMapDF - init-empty:\n")
    #print(str(dataMapDF))
@@ -3005,6 +3474,9 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #          rPM$dataMapDF with $ID.
    #          rPM$xxxxxB set 
    #
+   #          rPM$palColors
+   #          rPM$proj4
+   #
    #    xRes <- SM_Build(rPM)
    #          rPM$censusYear, rPM$cYear, rPM$cY
    #          rPM$stateSelDel (?)
@@ -3013,14 +3485,20 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #          rPM$idMode (returned)
    #          rPM$categMode (???)
    #          rPM$dataMspDF  (must have build before this routine.
+   #
+   #          rPM$proj4, rPM$CRSproj4    -- transformation of returned polygons.
+   #
    #        Returns:
+   #          rPM$idMode                 -->   type of map.
    #          MV$data_proj, data_data, dataListData
    #          MV$states_proj, states_data,StateListDAll, StateListData
    #          MV$SeerRegs_proj, SeerRegs_data, SeerRegListAll, SeerRegListData
    #          MV$regions_proj, regions_data, RegionsListAll, RegionsListData
+   #          MV$hsa_proj, hsa_data, HsaListAll, HsaListData  # ******
    #          MV$co_proj,co_data,CountyListAll, CountyListData
    #          MV$tr_proj,tr_data,TractListAll, TractListData
    #          MV$co99_mapr
+   #          Internal Calls:
    #             SM_SetDef(rPM) -> rPM
    #             SM_Impl_B(rPM,MV) -> MV
    #             SM_box_sel(rPM,MV) ->xRes$rPM and xRes$MV
@@ -3032,6 +3510,10 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #          rPM$ColorB_Data, ColorB_O_Tract... Region
    #          rPM$dataBCol,
    #          rPM$dataMapDF
+   #
+   #          rPM$proj4String,
+   #          rPM$palColors,
+   #   
    #          MV$data_proj_sel
    #          MV$data_data_sel    ($col holds the sub-area color.)
    #          MV$rg_proj_sel ... tr_proj_sel
@@ -3039,8 +3521,11 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #          MV$regionPList...tractBList
    #          MV$rgGO ... trGO
    #          data_data$col (color of subarea)
+   #
    #          rPM$dataBCol  (color of border)
    #          rPM$HatchFlag
+   #          rPM$Hatch2Flag 
+   #
    #          MV$trSP, ... MV$rgSP
    #          return(xRes$xyBox)
    #
@@ -3073,7 +3558,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
    
    dataMapDF <- rPM$dataMapDF   # restore dataMapDF is changed in SM_Build
    
-   #cat("completed SM_Build Z-3048 .\n")
+   #cat("completed SM_Build Z-3574 .\n")
    
    idList <- dataMapDF$ID   # get updated ID Lists after SM_Build edit.
    lenIdList <- length(idList)
@@ -3094,6 +3579,29 @@ satscanMapper <- function (resDir       = NULL,           # Required
    states_data    <- MV$states_data
    states_proj    <- MV$states_proj
    
+   # pull over "scale" variable - needed to scale outline for states like Alaska.
+   xM               <- match(st99.index$stID,states_data$stID)
+   st99.index$scale[!is.na(xM)] <- states_data$scale[xM][!is.na(xM)]   # save scale value
+   st99.index$moveX[!is.na(xM)] <- states_data$moveX[xM][!is.na(xM)]   # save X move
+   st99.index$moveY[!is.na(xM)] <- states_data$moveY[xM][!is.na(xM)]   # save Y move
+   
+   xM               <- match(co99.index$stID,StateListDAll)
+   #  must be stID match and in the right census year.
+   xMGood           <- !is.na(xM) & ( bitwAnd(co99.index$y,yF)==yF )  # exist in state list and cur census year.
+      
+   co99.index       <- co99.index[xMGood,]  # keep only counties for census year and states with data.
+   #coSelList        <- co99.index$ID
+      
+   xM               <- match(pl99.index$stID,StateListDAll)
+   xMGood           <- !is.na(xM) 
+   pl99.index       <- pl99.index[xMGood,]   # keep places for states with data.
+   #plSelList        <- pl99.index$ID
+   
+   xM               <- match(tr99.index$stID,StateListDAll)
+   xMGood           <- !is.na(xM) & ( bitwAnd(tr99.index$y,yF)==yF )
+   tr99.index       <- tr99.index[xMGood,]   # only keep rows with states matching the data.
+   #trSelList        <- tr99.index$ID
+   
    #
    # differences between states_data and st99_data 
    #                    states_data  		st99_data -> st99.index
@@ -3107,11 +3615,12 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #        dvID        -   Y          		  Y
    #        dvName      -   Y          		  Y
    #        loc         -   Y			  Y
-   #        DoAdj       -   Y          	
-   #        moveX       -   Y          
-   #        moveY       -   Y          
+   #        DoAdj       -   Y          		  Yes
+   #        moveX       -   Y                     Added
+   #        moveY       -   Y                     Added
    #        scale       -   Y   		  Added      
-   #        proj        -   Y         
+   #        proj        -   Y         		  Yes
+   #        hsa         -   hsa00, hsa10          hsa_00, hsa_10   # ******
    #        county      -   county00, county10	  county_00, county_10
    #        tracts      -   tracts00, tracts10	  tracts_00, tracts_10
    #        change10    -   Y			  Y
@@ -3183,228 +3692,6 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #
    ####
 
-   ####
-   #
-   #  Load information structures for State, State/County, State/County/Census Tract
-   #
-   #
-   #   Get state, county and census tract location ID information 
-   #    for census years 2000 and 2010.  As of v1.0.0 we don't deal
-   #    boundary files any longer.
-   #
-   st99_data <- NULL
-   co99_data <- NULL
-   tr99_data <- NULL
-   pl99_data <- NULL
-
-   #  Step 1 - load index structures.
-   
-   #  Initialize - make sure old structures are GONE.
-   #
-   if (debugFlag) {
-      ldir <- "c:/projects/statnet/r code/satscanMapper-1.0.0/data/"
-      st99FN <- paste0(ldir,"st99_data.rda")
-      co99FN <- paste0(ldir,"co99_data.rda")
-      pl99FN <- paste0(ldir,"pl99_data.rda")   # load only if tr level data 
-      tr99FN <- paste0(ldir,"tr99_data.rda")   # load only if tr level data  
-      #
-      load(file=st99FN)
-      load(file=co99FN)
-      load(file=pl99FN)
-      load(file=tr99FN)
-   } else {
-      data(st99_data,envir = environment(),package="satscanMapper")
-      data(co99_data,envir = environment(),package="satscanMapper")
-      data(pl99_data,envir = environment(),package="satscanMapper")
-      data(tr99_data,envir = environment(),package="satscanMapper")
-   }
-   
-   #cat("data sets loaded for satscanMapper Z-3194.\n")
-   
-   #
-   #  The above loads the three working table indexes:
-   #        st99_data   (State Fips to literals)
-   #        co99_data   (State/County Fips to literals)
-   #        pl99_data   (State/County/Place to literals, used with tract data)
-   #        tr99_data   (State/County/Census Tract Fips to literals ???)
-   #
-   #    Both the county and census tract index will be edited to only the required states.
-   #
-   #    census year filter = 2000 -> 1    2010 -> 2
-   #
-   yF   <- 1
-   
-   if (censusYear == "2010")  yF <- 2
-   
-   #cat("Set up st99.index structure for run Z-3211 .\n")
-   
-   st99.index       <- st99_data
-   st99.index$ID    <- row.names(st99.index)
-   st99.index$stID  <- as.character(st99.index$ID)
-   #stAllList        <- st99.index$stID
-      
-   # pull over "scale" variable
-   xM             <- match(st99.index$stID,states_data$stID)
-   st99.index$scale[!is.na(xM)] <- states_data$scale[xM][!is.na(xM)]   # save scale value
-     
-   #cat("st99.index updated - Z-3222 \n")
-   #print(st99.index)
-   
-   
-   #
-   # st99.index fields
-   #    $abbr
-   #    $stName
-   #    $rgID
-   #    $rgName
-   #    $dvID
-   #    $dvName
-   #    $loc
-   #    $county_00
-   #    $county_10
-   #    $tract_00
-   #    $tract_10
-   #    $change10
-   #    $c_X
-   #    $c_Y
-   #    
-   #    $ID
-   #    $stID
-   #    $scale
-   #
-   #    $use
-   #
-   
-   #cat("Set up co99.index structure for run.\n")
-    
-   co99.index       <- co99_data
-   co99.index$ID    <- row.names(co99.index)
-   co99.index$stcoID<- co99.index$ID
-   co99.index$stID  <- as.character(co99.index$stID)
-   co99.index$stName<- as.character(co99.index$stName)
-   co99.index$saID  <- as.character(co99.index$saID)
-
-   co99No           <- str_sub(co99.index$ID,3,5) == "000"
-   co99.index       <- co99.index[!co99No,]
-   
-   #coAllList        <- co99.index$ID
-   
-   #
-   # co99.index fields
-   #    $stID
-   #    $stName
-   #    $coName
-   #    $saID
-   #    $c_X_00
-   #    $c_Y_00
-   #    $c_X_10
-   #    $c_Y_10
-   #    $tracts_00
-   #    $tracts_10
-   #    $y
-   #
-   #    $ID
-   #
-   #    $ID
-   #    $stID
-   #    $stName
-   #    $saID
-   #    $stcoID
-   #
-   
-   #
-   #  edit tables to only have data for the selected census year.
-   #
-   
-   xM               <- match(co99.index$stID,StateListDAll)
-   #  must be stID match and in the right census year.
-   xMGood           <- !is.na(xM) & ( bitwAnd(co99.index$y,yF)==yF )  # exist in state list and cur census year.
-   
-   co99.index       <- co99.index[xMGood,]  # keep only counties for census year and states with data.
-   #coSelList        <- co99.index$ID
-   
-   #cat("Set up pl99.index structure for run.\n")
-   
-   pl99.index       <- pl99_data
-   pl99.index$ID    <- row.names(pl99.index)
-   pl99.index$stID  <- str_sub(pl99.index$stcoID,1,2)
-   #plAllList        <- pl99.index$ID
-   
-   #
-   #  pl99.index fields
-   #     $stcoID
-   #     $plName
-   #     $tracts_00
-   #     $tracts_10
-   #
-   #     $ID
-   #     $stID 
-   #
-   
-   xM               <- match(pl99.index$stID,StateListDAll)
-   xMGood           <- !is.na(xM) 
-   pl99.index       <- pl99.index[xMGood,]   # keep places for states with data.
-   #plSelList        <- pl99.index$ID
-   
-   #cat("Set up tr99.index structure for run.\n")
-   
-   tr99.index       <- tr99_data
-   tr99.index$ID    <- row.names(tr99.index)
-   tr99.index$stID  <- str_sub(tr99.index$ID,1,2)
-   tr99.index$stcoID<- str_sub(tr99.index$ID,1,5)
-   #trAllList        <- tr99.index$ID
-   
-   xM               <- match(tr99.index$stID,StateListDAll)
-   xMGood           <- !is.na(xM) & ( bitwAnd(tr99.index$y,yF)==yF )
-   tr99.index       <- tr99.index[xMGood,]   # only keep rows with states matching the data.
-   #trSelList        <- tr99.index$ID
-   
-   tr99.index$stAbbr<- st99.index[tr99.index$stID,"abbr"]
-   tr99.index$stName<- st99.index[tr99.index$stID,"stName"]
-   tr99.index$coName<- co99.index[tr99.index$stcoID,"coName"]
-   
-   tr99.index$plName <- str_sub(tr99.index$plKey,6)
-   
-   # 
-   #  tr99.index fields
-   #    $stID
-   #    $plKey
-   #    $c_X_00
-   #    $c_Y_00
-   #    $c_X_10
-   #    $c_Y_10
-   #    $y
-   #    
-   #    $ID
-   #    $stcoID
-   #    $stAbbr
-   #    $stName
-   #    $coName
-   #    $plName
-   #
-   
-   #str(st99.index)
-   #str(co99.index)
-   #str(pl99.index)
-   #str(tr99.index)
-   
-   suppressWarnings(rm(st99_data))
-   suppressWarnings(rm(co99_data))
-   suppressWarnings(rm(pl99_data))
-   suppressWarnings(rm(tr99_data))
-   
-   #
-   #  In all tables (co99 and tr99) only the states with data are included and only
-   #  the entries related to the specified census year.   xxxAllList variables 
-   #  are taken before the census year and state edit. (all IDs in data tables.)
-   #  The DI lists after the state and year edit are in xxxSelList.
-   #
-   
-   #
-   #  2000 and 2010 Census area information is loaded.
-   #
-   ####
-
    #####
    ##   Preformed by SM_Build in SeerMapper
    ##
@@ -3472,17 +3759,22 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #
    # county and/or tract data
    cyXY  <- c("c_X_00","c_Y_00")  # centroids
-   cyTr  <- c("tracts_00")        # tracts
+   cyHs  <- c("hsa_00")           # counties
    cyCo  <- c("county_00")        # counties
+   cyTr  <- c("tracts_00")        # tracts
+
    if (censusYear == "2010")  {
       cyXY  <- c("c_X_10","c_Y_10")
-      cyTr  <- c("tracts_10")
+      cyHs  <- c("hsa_10")
       cyCo  <- c("county_10")
+      cyTr  <- c("tracts_10")
    }
+
    if (LocIDType == 2) {  # if state data..
       # state level
       cyXY  <- c("c_X","c_Y")    # same for both census years
    }
+
    #cat("cyXY:",cyXY,"\n")  # list the labels
    
    #####
@@ -3492,18 +3784,28 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #
    #####
    
-   st99.index$county  <- st99.index[,cyCo]     # pick up state county count for year
-   st99.index$tracts  <- st99.index[,cyTr]     # pick up state tract count for year
-   co99.index$tracts  <- co99.index[,cyTr]     # pick up county tract count for year
-   pl99.index$tracts  <- pl99.index[,cyTr]     # pick up place tract count for year
+   #st99.index$hsa     <- st99.index[,cyHs]     # pick up state hsa count for year
+   st99.index$county   <- st99.index[,cyCo]     # pick up state county count for year
+   st99.index$tracts   <- st99.index[,cyTr]     # pick up state tract  count for year
    
-   co99.index  <- co99.index[co99.index$tracts != 0,]   # remove entires with no tracts
-   pl99.index  <- pl99.index[pl99.index$tracts != 0,]
+   #hs99.index$county  <- hs99.index[,cyCo]     # pick up hsa county count for year
+   #hs99.index$tracts  <- hs99.index[,cyTr]     # pick up hsa tract count for year
    
-   us99.index  <- NULL
-   us99.index$states  <- dim(st99.index)[1]
-   us99.index$county  <- sum(st99.index$county)
-   us99.index$tracts  <- sum(st99.index$tracts)
+   co99.index$tracts   <- co99.index[,cyTr]     # pick up county tract count for year
+
+   pl99.index$tracts   <- pl99.index[,cyTr]     # pick up place tract count for year
+   
+   #hs99.index         <- hs99.index[hs99.index$county != 0,]   # remove entries with no counties
+   #hs99.index         <- hs99.index[hs99.index$tracts != 0,]   # remove entries with no tracts
+
+   co99.index          <- co99.index[co99.index$tracts != 0,]   # remove entires with no tracts
+   pl99.index          <- pl99.index[pl99.index$tracts != 0,]
+   
+   us99.index          <- NULL
+   us99.index$states   <- dim(st99.index)[1]
+   #us99.index$hsa      <- sum(st99.index$hsa)
+   us99.index$county   <- sum(st99.index$county)
+   us99.index$tracts   <- sum(st99.index$tracts)
    
    
    #cat("us99.index:\n")
@@ -3540,6 +3842,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
    vRegionB <- "NONE"
    vStateB  <- "NONE"
    vSeerB   <- "NONE"
+   vHsaB    <- "NONE"
    vCountyB <- "NONE"
    vTractB  <- "NONE"
    
@@ -3554,7 +3857,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
    # Init and Collect working data.frame (wk99)
    wk99 <- NULL
    
-   #cat("LocIDType Z-3529 :",LocIDType,"  idList:\n")
+   #cat("LocIDType Z-3841 :",LocIDType,"  idList:\n")
    #print(head(idList))
    
    if (LocIDType == 2) {
@@ -3583,6 +3886,15 @@ satscanMapper <- function (resDir       = NULL,           # Required
       vRegionB       <- "DATA"
       vStateB        <- vDataB
       
+   }
+   if (LocIDType == 3) {
+      cat("getting HSA level wk99 table with centroids.\n")
+      # HSA level data
+      #cat("colnames(hs99.index):",colnames(hs99.index),"\n")
+      #
+      #  Complete Coding 
+      #
+   
    }
    if (LocIDType == 5) {
       #cat("getting county level wk99 table with centroids.\n")
@@ -3649,6 +3961,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
    rPM$regionB      <- vRegionB
    rPM$stateB       <- vStateB
    rPM$seerB        <- vSeerB
+   rPM$hsaB         <- vHsaB
    rPM$countyB      <- vCountyB
    rPM$tractB       <- vTractB
    
@@ -3751,7 +4064,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
  
    #
    ####
-   #cat("Mapping Level Z-3647 - IDName:",IDName,"\n")   
+   #cat("Mapping Level Z-4065 - IDName:",IDName,"\n")   
    #cat("SeerMapper Parameters - regionB:",vRegionB,"  stateB:",vStateB,"  seerB:",vSeerB,"  countyB:",vCountyB,"  tractB:",vTractB,"\n")
    
    ####
@@ -3965,16 +4278,24 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #       stateB =DATA    or "NONE"
    #       seerB  =NONE
    #
+   #   if hsa:
+   #       region =FALSE
+   #       stateB =NONE
+   #       seerB  =NONE
+   #       hsaB   =DATA
+   #
    #   if county:
    #       region =FALSE
    #       stateB =ALL
    #       seerB  =NONE
+   #       hsaB   =NONE
    #       countyB=STATE   or "NONE"
    #
    #   if tract:
    #       region =FALSE
    #       stateB =NONE
    #       seerB  =NONE
+   #       hsaB   =NONE
    #       countyB=DATA
    #       tractB =COUNTY  or "NONE"
    #
@@ -4044,8 +4365,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
             }
          }
       }
-      
-      
+            
       EllipseSetBase$E_MAJOR <- EllipseSetBase$E_MAJOR * EllipseSetBase$scale
       EllipseSetBase$E_MINOR <- EllipseSetBase$E_MINOR * EllipseSetBase$scale
      
@@ -4095,7 +4415,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
 
    ###
    
-   #cat("EllipseSetBase Z-4060 \n")
+   #cat("EllipseSetBase Z-4400 \n")
    #print(str(EllipseSetBase))
    #print(head(EllipseSetBase))
    
@@ -4111,16 +4431,31 @@ satscanMapper <- function (resDir       = NULL,           # Required
    
    pdf(file=OutputFNpdf,width=vW,height=vH)
    
-   rPM$Mar <- c(5.1,4.1,4.1,2.1)
-   par(mar=c(5.1,4.1,4.1,2.1))  # default
-   #          B   L   T   R
+   par( omi=c(0.5,0.5,0.5,0.5) )    # outer margin of 0.5 border
+   #           B   L   T   R
+   rPM$omi <- c(0.5,0.5,0.5,0.5) 
+   
+   par( mar=c(4.1,2.1,5.1,2.1) )  # default inner margins
+   #           B   L   T   R
+   rPM$mar <- c(4.1,2.1,4.1,2.1)  # top = 5 lines, bottom = 4 lines , left & right = 2 (not used)
 
-
+   
    #   Titles
-   #     vTitle - user provided MAIN title
-   #     SMTitle - Page title
-   #     R1Title or R2Title - type of data on map Loc or Clu ODE
+   #     vTitle - user provided MAIN title  (vTitle)
+   #     SMTitle - Page title               (vGLine)
+   #     R1Title or R2Title - type of data on map Loc or Clu ODE (vPLine) or legends
    #
+   vTLine <- 2            # (Line 3)
+   vGLine <- 1            # (Line 2)  
+   vPLine <- 0.01         # (Line 1)
+   if (length(vTitle) > 1) {   # number of user title lines.
+      vTLine <- vTLine + 0.5
+      vGLine <- vGLine - 0.2
+   } 
+   #
+   #  Legends Page:   vTLine & space (.5 line) & vPLine 
+   #
+   #  Map pages:      vTLine & vGLine & vPline 
    #     
    #
    ###
@@ -4131,8 +4466,13 @@ satscanMapper <- function (resDir       = NULL,           # Required
    
    plot.new()
 
-   title(main=vTitle, line=2.5,cex.main=TL2Cex)     # cluster title (Top Line)
-   title(main="Mapping Legends",line=1,cex.main=TL2Cex*0.93)
+   #   run title at line 1.5; page title at 0.01 line 0
+   #
+   title(main=vTitle,            line=vTLine-0.5,  cex.main=TL2Cex)     # cluster title (Top Line)
+   
+   #
+   #
+   title(main="Mapping Legends", line=vPLine,      cex.main=TL2Cex*0.93)
    
    #
    #  Adjust label off right
@@ -4223,7 +4563,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #
    #  page 2 and forward.
    #
-   #cat("page 2 - maps Z-4045 \n")
+   #cat("page 2 - maps Z-4565 \n")
 
    data_data_sel <- MV$data_data_sel
    wk99IDs       <- wk99$ID
@@ -4334,7 +4674,6 @@ satscanMapper <- function (resDir       = NULL,           # Required
       wk99[wGisTable$LOC_ID,"EYr"]     <- wGisTable$EYr
            
            
-           
       xM     <- match(wk99$ClusNum,wColTable$CLUSTER)   # get cluster dates.
    
       wk99$ClusSYr  <- wColTable$SYr[xM]
@@ -4397,6 +4736,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
             cat("regionB   :",regionB,  "\n")
             cat("stateB    :",vStateB,  "\n")
             cat("seerB     :",vSeerB,   "\n")
+            cat("hsaB      :",vHsaB,    "\n")
             cat("countyB   :",vCountyB, "\n")
             cat("tractB    :",vTractB,  "\n")
             cat("LocIDType :",LocIDType,"\n")
@@ -4442,9 +4782,9 @@ satscanMapper <- function (resDir       = NULL,           # Required
              PlotClusterOutline(wEllipseSetLen, wEllipseSet, vLabel, ClusLabCol)
          }
          
-         title(main=vTitle,line=3,cex.main=TL2Cex)     # cluster title (Top Line        
-         title(main=SMTitle,line=2,cex.main=TL2Cex*0.9)
-         title(main=R1Title,line=1,cex.main=TL2Cex*0.9)
+         title(main=vTitle,line=vTLine,cex.main=TL2Cex)     # cluster title (Top Line        
+         title(main=SMTitle,line=vGLine,cex.main=TL2Cex*0.9)
+         title(main=R1Title,line=vPLine,cex.main=TL2Cex*0.9)
       }
       
       #
@@ -4488,9 +4828,9 @@ satscanMapper <- function (resDir       = NULL,           # Required
          }
    
          
-         title(main=vTitle,line=3,cex.main=TL2Cex)     # cluster title (Top Line)
-         title(main=SMTitle,line=2,cex.main=TL2Cex*0.9)
-         title(main=R2Title,line=1,cex.main=TL2Cex*0.9)
+         title(main=vTitle,line=vTLine,cex.main=TL2Cex)     # cluster title (Top Line)
+         title(main=SMTitle,line=vGLine,cex.main=TL2Cex*0.9)
+         title(main=R2Title,line=vPLine,cex.main=TL2Cex*0.9)
   
 
       } # end of cluster maps for this year.
@@ -4514,13 +4854,16 @@ satscanMapper <- function (resDir       = NULL,           # Required
    
    TractN <- "tracts_00"
    CountyN<- "county_00"
+   HsaN   <- "hsa_00"
    if (censusYear == "2010") {
       TractN <- "tracts_10"
       CountyN<- "county_10"
+      HsaN   <- "hsa_10"
    }
    
    DataTypeLit <- switch(as.character(LocIDType),
                    "2" = "State Location IDs",
+                   "3" = "State/HSA Location IDs",
                    "5" = "State/County Location IDs",
                    "11" = "State/County/Census Tract Location IDs",
                    "Unknown Location IDs"
@@ -4620,21 +4963,23 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #  Build US header variables
    USRes              <- NULL
    USRes$TStates      <- us99.index$states
+   #USRes$THsas        <- us99.index$hsas
    USRes$TCounty      <- us99.index$county
    USRes$TTracts      <- us99.index$tracts
    # format
    USRes$LTStates     <- sprintf("%8i",USRes$TStates)
+   #USRes$LTHsas       <- sprintf("%8i",USRes$THsas)
    USRes$LTCounty     <- sprintf("%8i",USRes$TCounty)
    USRes$LTTracts     <- sprintf("%8i",USRes$TTracts)
    
-   #cat("USRes - typeof:",typeof(USRes),"  class:",class(USRes)," Z-4474 \n")
+   #cat("USRes - typeof:",typeof(USRes),"  class:",class(USRes)," Z-4947 \n")
  
    ####
    #
    #   Loop through clusters and report statistics on Cluster Info, Location Info
    #
    ####
-   #cat("Loop through cluster and build report stats Z-4495 .\n")
+   #cat("Loop through cluster and build report stats Z-4954 .\n")
    
    ESet       <- EllipseSetBase
    ESet_L     <- dim(ESet)[1]
@@ -4768,7 +5113,6 @@ satscanMapper <- function (resDir       = NULL,           # Required
          xx <- paste("            ",capture.output(print(ESWork3,row.names=FALSE)),sep="")
          writeLines(xx,con=TxtCon)
         
-         writeLines(" ",con=TxtCon)
         
          #  Catagorize locations based on Obs_Exp ratio value
          #
@@ -4799,7 +5143,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
          #
          ####
          
-         #cat("Get GisLocList Z-4659 - colnames:",colnames(GisList),"\n")
+         #cat("Get GisLocList Z-5118 - colnames:",colnames(GisList),"\n")
          
          #
          #  Modify if NORMAL supported.
@@ -4829,6 +5173,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
                
                GisLocList$stID    <- GisLocList$LOC_ID
                GisLocList$State   <- st99.index[GisLocList$stID,"stName"]
+               #GisLocList$HsaID   <- ""
                #  Key # 1 - stcoID   ->  State/County code
                GisLocList$stcoID  <- ""
                GisLocList$County  <- ""
@@ -4838,11 +5183,36 @@ satscanMapper <- function (resDir       = NULL,           # Required
                #  Counts
                GisLocList$TState   <- 1
                GisLocList$StateIn  <- 1
+               #GisLocList$THsas    <- st99.index(GisLocList$stID,"hsas"]
+               #GisLocList$THsasIn  <- st99.index(GisLocList$stID,"hsas"]
                GisLocList$TCounty  <- st99.index[GisLocList$stID,"county"]
                GisLocList$CountyIn <- st99.index[GisLocList$stID,"county"]
                GisLocList$TTracts  <- st99.index[GisLocList$stID,"tracts"]
                GisLocList$TractsIn <- st99.index[GisLocList$stID,"tracts"]
             }
+            
+            #if (LocIDType == 3) {   # State/HSAs
+            #   leadBlk            <- "        "
+            #   #  add additional fields for State/Hsas Location
+            #   GisLocList$HsaID   <- str_trim(GisLocList$LOC_ID)
+            #   GisLocList$stID    <- hs99.index[GisLocList$LOC_ID,"stID"] # go to HSA table and look up state.
+            #   GisLocList$State   <- st99.index[GisLocList$stID,"stName"]
+            #   GisLocList$stcoID  <- ""
+            #   GisLocList$County  <- ""
+            #   GisLocList$plKey   <- ""
+            #   GisLocList$Place   <- ""
+            #   
+            #   # Counts
+            #   GisLocList$TState   <- 0
+	    #   GisLocList$StateIn  <- 0
+	    #   GisLocList$THsas    <- 1
+	    #   GisLocList$HsasIn   <- 1
+	    #   GisLocList$TCounty  <- hs99.index[GisLocList$HsaID,"county"]
+	    #   GisLocList$CountyIn <- hs99.index[GisLocList$HsaID,"county"]
+	    #   GisLocList$TTracts  <- hs99.index[GisLocList$HsaID,"tracts"]
+	    #   GisLocList$TractsIn <- hs99.index[GisLocList$HsaID,"tracts"]
+            #   
+            #}
             
             if (LocIDType == 5) {
                leadBlk            <- "        "
@@ -4852,12 +5222,15 @@ satscanMapper <- function (resDir       = NULL,           # Required
                #  Key # 1 - stcoID   ->  State/County code
                GisLocList$stcoID  <- GisLocList$LOC_ID  # 5 digit fip code for state county
                GisLocList$County  <- co99.index[GisLocList$stcoID,"coName"]
+               #GisLocList$HsaID   <- co99.index(GisLocList$stcoID,"HsaID"]
                GisLocList$plKey   <- ""
                GisLocList$Place   <- ""
                
                #  Counts
                GisLocList$TState   <- 0
                GisLocList$StateIn  <- 0
+               #GisLocList$THsas    <- 0
+               #GisLocList$HsasIn   <- 0
                GisLocList$TCounty  <- 1
                GisLocList$CountyIn <- 1
                GisLocList$TTracts  <- co99.index[GisLocList$stcoID,"tracts"]
@@ -4873,6 +5246,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
                #  Key # 1 - stcoID   ->  State/County code
                GisLocList$stcoID  <- substr(GisLocList$LOC_ID,1,5)  # 5 digit fip code for state county
                GisLocList$County  <- co99.index[GisLocList$stcoID,"coName"]
+               #GisLocList$HsaID   <- co99.index(GisLocList$stcoID,"HsaID"]
               
                GisLocList$plKey   <- tr99.index[GisLocList$LOC_ID,"plKey"]
                GisLocList$Place   <- str_sub(GisLocList$plKey,6)
@@ -4880,6 +5254,8 @@ satscanMapper <- function (resDir       = NULL,           # Required
                #  Counts
                GisLocList$TState   <- 0
                GisLocList$StateIn  <- 0
+               #GisLocList$THsas    <- 0
+               #GisLocList$HsasIn   <- 0
                GisLocList$TCounty  <- 0
                GisLocList$CountyIn <- 0
                GisLocList$TTracts  <- 1
@@ -4898,12 +5274,35 @@ satscanMapper <- function (resDir       = NULL,           # Required
             #          State Accum 
             #             County Detailed (LOC)
             #
+            #  Alternate # 1
+            #
+            #     US summary record
+            #       Cluster summary record (CLUS)
+            #          State Accum 
+            #             County Detailed (LOC)
+            #
             #     US summary record
             #       Cluster summary record (CLUS)
             #          State Accum
             #             County Accum
             #                Place Accum
             #                   Tract Detailed (LOC)
+            #
+            #  Alternate # 2
+            #
+            #     US summary record
+            #       Cluster summary record (CLUS)
+            #          State Accum 
+            #             Hsa Accum 
+            #                County Detailed (LOC)
+            #
+            #     US summary record
+            #       Cluster summary record (CLUS)
+            #          State Accum
+            #             Hsa Accum 
+            #                County Accum
+            #                   Place Accum
+            #                      Tract Detailed (LOC)
             #
             #
             #
@@ -4912,6 +5311,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
           
             #  Get maximum width of each field - State, County, Place names
             MaxState      <- max(sapply(GisLocList$State,    function(x) nchar(as.character(x))))
+            #MaxHsa        <- max(sapply(GisLocList$Hsa,      function(x) nchar(as.character(x))))
             MaxCounty     <- max(sapply(GisLocList$County,   function(x) nchar(as.character(x))))
             MaxPlace      <- max(sapply(GisLocList$Place,    function(x) nchar(as.character(x))))
             MaxCategory   <- max(sapply(GisLocList$Category, function(x) nchar(as.character(x)))) + 2  
@@ -4919,11 +5319,12 @@ satscanMapper <- function (resDir       = NULL,           # Required
               
             MaxColumn     <- 11 + 12 + 2   # standard column max.
             if (MaxColumn < (MaxState + 2))  MaxColumn <- MaxState + 2
+            #if (MaxColumn < (MaxHsa + 2))    MaxColumn <- MaxHsa + 2
             if (MaxColumn < (MaxCounty + 5)) MaxColumn <- MaxCounty + 5
             if (MaxColumn < (MaxPlace + 10)) MaxColumn <- MaxPlace + 10
               
             # ssscccppplll = 12 characters
-            # Longest  State + 2, County + 3, Place + 6, Location + 12 (11+12)  - all plus 2
+            # Longest  State + 2, Hsa + 2, County + 3, Place + 6, Location + 12 (11+12)  - all plus 2
             # 
             
             #
@@ -4963,6 +5364,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
             
             #
             #  State Detailed
+            #  Hsa Detailed
             #  County Detailed
             #  Tract Detailed
             #
@@ -4978,10 +5380,15 @@ satscanMapper <- function (resDir       = NULL,           # Required
             
             # Numbers sections:
             #    State Accum
+            #    Hsa Accum
             #    County Accum
             #    Place Accum
             
             #    Titles
+            
+            #
+            #  Update to include HSA counts - may need to have as option.
+            #
             
             #   Basic Pattern for ODE, States, Counties, Tracts
             TObsExpODE        <- "  Observed  Expected  Obs/Exp"
@@ -5135,6 +5542,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
                GisLOrd <- order(GisLocList[,"Obs_Exp"],decreasing=TRUE)
                
                #  State Header
+               writeLines(" ",con=TxtCon)
                writeLines(paste0(str_pad("  State",MaxColumn,"right"),DetailHdrSt),con=TxtCon)
                
                lenStList  <- dim(GisLocList)[1]
@@ -5251,13 +5659,14 @@ satscanMapper <- function (resDir       = NULL,           # Required
                
                ResSOrd <- order(ResSt$Obs_Exp,decreasing=TRUE)
                
-               #  state title header
-               writeLines(paste0(str_pad("State",MaxColumn,"right"),AccumHdrSt),con=TxtCon)
-              
                lenStList   <- length(ResSOrd)  # get number of states from aggregate
                #cat("Length of state Aggreg List:",lenStList,"\n")
                
                for (inSt in seq_len(lenStList)) {
+              
+                  #  state title header
+                  writeLines(" ",con=TxtCon)
+                  writeLines(paste0(str_pad("State",MaxColumn,"right"),AccumHdrSt),con=TxtCon)
               
                   inSSt  <- ResSOrd[inSt]      # get order of states within cluster
                   
@@ -5287,10 +5696,12 @@ satscanMapper <- function (resDir       = NULL,           # Required
                   #cat("Length of County details list:",lenCoList,"\n")
                   
                   # County Details Header
+                  writeLines(" ",con=TxtCon)
                   writeLines(paste0(str_pad("    County",MaxColumn,"right"),DetailHdrCo),con=TxtCon)
    
                   # County detail records
                   for (inCo in c(1:lenCoList)) {
+
                      inSCo    <- CoLocOrd[inCo]
                      cat(unlist(CoLocList[inSCo,c("Name","LObserved","LExpected","LObs_Exp",
                                            "LTTracts","LTractsIn","LPCTrIn",
@@ -5524,9 +5935,10 @@ satscanMapper <- function (resDir       = NULL,           # Required
               ResSt$LTractsIn <- sprintf("%10i",ResSt$TractsIn)
               ResSt$PCTrIn    <- ResSt$TractsIn/ResSt$TTracts * 100
               ResSt$LPCTrIn   <- sprintf("%10.2f%%",ResSt$PCTrIn)
+              
               #  State Header with County
               
-              #cat("ResS Z-5331 :\n")
+              #cat("ResS Z-5913 :\n")
               #print(str(ResS))
               #print(head(ResS,10))
               
@@ -5535,14 +5947,15 @@ satscanMapper <- function (resDir       = NULL,           # Required
               
               #cat("starting Tract Report\n")
               # report 
-              # state header
-              writeLines(paste0(str_pad("  State",MaxColumn,"right"),AccumHdrSt),con=TxtCon)
               
               lenStList   <- length(ResSOrd)
               
               # state Loop
               for (inSt in seq_len(lenStList)) {
-              
+                 writeLines(" ",con=TxtCon)
+                 # state header
+                 writeLines(paste0(str_pad("  State",MaxColumn,"right"),AccumHdrSt),con=TxtCon)
+                 
                  inSSt        <- ResSOrd[inSt]
                  CurStID      <- ResSt[inSSt,"stID"] # Get state ID for this loop.
                  
@@ -5569,11 +5982,11 @@ satscanMapper <- function (resDir       = NULL,           # Required
                  
                  #cat("CoWrkOrd:",CoWrkOrd,"\n")
                   
-                 # county header 
-                 writeLines(paste0(str_pad("      County",MaxColumn,"right"),AccumHdrCo),con=TxtCon)
-                            
                  # county loop
                  for (inCo in seq_len(lenCoWrkRes)) {
+                    # county header 
+                    writeLines(" ",con=TxtCon)
+                    writeLines(paste0(str_pad("      County",MaxColumn,"right"),AccumHdrCo),con=TxtCon)
                  
                     inSCo       <- CoWrkOrd[inCo]
                     CurStcoID   <- ResSC[inSCo,"stcoID"]  # get current county id
@@ -5600,10 +6013,11 @@ satscanMapper <- function (resDir       = NULL,           # Required
                     
                     #cat("plWrkOrd:",plWrkOrd,"\n")
                     
-                    writeLines(paste0(str_pad("          Placename",MaxColumn,"right"),AccumHdrPl),con=TxtCon)
-                 
                     # Place Loop
                     for (inPl in seq_len(lenPlWrkRes)) {
+                       writeLines(" ",con=TxtCon)
+                       writeLines(paste0(str_pad("          Placename",MaxColumn,"right"),AccumHdrPl),con=TxtCon)
+                 
                        inSPl     <- plWrkOrd[inPl]    # ordered index to placename data line
                        
                        CurPlKey  <- plWrkRes[inSPl,"plKey"]   # current entry
@@ -5635,6 +6049,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
       
                        #cat("trLocOrd:",trLocOrd,"\n")
                        
+                       #writeLines(" ",con=TxtCon)
                        writeLines(paste0(str_pad("              Census Tract",MaxColumn,"right"),DetailHdrTr),con=TxtCon)
                        
                        # Tract Loop

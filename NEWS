@@ -1,0 +1,20 @@
+satscanMapper - Version 1.0.0
+
+	Initial Release
+	
+satscanMapper - Version 1.0.1
+
+	Adhere to CRAN Depository Requirements that a package
+	does not write into a user's filespace.  satscanMapper
+	originally wrote the graphics and text results files
+	back to the directory containing the SaTScan(TM) 
+	results files.  However, to be able to execute
+	an example in the package, this cause the package
+	to write the files back to the packages extData directory
+	within the package.
+	
+	The "outDir" call parameter has been added to 
+	direct the writing of the output files to an acceptable
+	directory.
+	
+	
