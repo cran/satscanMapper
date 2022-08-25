@@ -99,7 +99,8 @@
    }
   \item{report}{This is logical value.  If \var{TRUE} a text report of the statistics from each 
     cluster and location in a tier format by State, County, Place, and Location (Census Tract) 
-    will be created.  If var{FALSE}, no report is generated.  The default is \var{TRUE}.
+    will be created.  If var{FALSE}, a summary report is generated.  The default is \var{TRUE} 
+    for a full report.
    }
   \item{runId}{If a user is creating multiple mappings of the same SaTScan (TM) 
     Results Data Files, but with different arguments and options, they will want 
@@ -304,9 +305,9 @@ Jim Pearson and Linda Pickle of StatNet Consulting, LLC, Gaithersburg, MD
 #
 #   Get location of .prm file and location to write mapping output files
 #
-#\dontrun{
-#tempdirOut <- tempdir()
-#cat("tempDirOut:",tempdirOut,"\n")
+\dontrun{
+tempdirOut <- tempdir()
+cat("tempDirOut:",tempdirOut,"\n")
 
 SSMInstDir <- system.file(package="satscanMapper", "extdata")
 cat("SSMInstDir:",SSMInstDir,"\n")
@@ -315,11 +316,10 @@ TT =c("Contiguous US States All Lung Cancer Mortality, 2004")
 
 satscanMapper(resDir   = SSMInstDir,                # path to .prm file location for output files. 
               prmFile  = "stateLung.prm", 
-              outDir   = "",
+              outDir   = tempdirOut,
               title    = TT    
              )
-#}
-#
+}
 ##  end of example # 1  Removed due to time constraints.
 ##
 ######
@@ -330,10 +330,9 @@ satscanMapper(resDir   = SSMInstDir,                # path to .prm file location
 #     named "inc_noadj_cir" files
 #     Make sure SaTScan (TM) results files are still located in the directories
 #     documented in the session saved (.prm) file.
-#
 \dontrun{
-#tempdirOut <- tempdir()
-#cat("tempDirOut:",tempdirOut,"\n")
+tempdirOut <- tempdir()
+cat("tempDirOut:",tempdirOut,"\n")
 
 SSMInstDir <- system.file(package="satscanMapper", "extdata")
 
@@ -341,7 +340,7 @@ TT = "Contiguous US County Female Breast Cancer Incidence, 2009-2013"
 
 satscanMapper(resDir=SSMInstDir,              # path to .prm file location for output files. 
               prmFile    = "inc_noadj_ellip_hilo_10_nosp.prm", 
-              outDir     = "",
+              outDir     = tempdirOut,
               categ      = 7,
               title      = TT,
               censusYear = "2010"

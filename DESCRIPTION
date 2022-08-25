@@ -1,13 +1,14 @@
 Package: satscanMapper
 Type: Package
-Version: 1.0.1
-Date: 2018-06-30
+Version: 1.0.2
+Date: 2022-08-24
 Title: 'SaTScan' (TM) Results Mapper
-Author: Jim Pearson <jpearson@statnetconsulting.com>, with support from 'NCI'.
-Maintainer: Jim Pearson <jpearson@statnetconsulting.com>
+Authors@R: c(person("Jim","Pearson",email="jbpearson353@gmail.com",role=c("aut","cre","cph")))
+Author: Jim Pearson [aut, cre, cph]
+Maintainer: Jim Pearson <jbpearson353@gmail.com>
 Imports: graphics, grDevices, utils, foreign, stringr, RColorBrewer,
         stats, sp, methods, SeerMapper
-Depends: R (>= 3.3.0)
+Depends: R (>= 3.6.0)
 Description: Supports the generation of maps based on the results from 
      'SaTScan' (TM) cluster analysis.
      The package handles mapping of Spatial and Spatial-Time analysis using
@@ -34,6 +35,6 @@ LazyLoad: no
 BuildResaveData: best
 ByteCompile: yes
 NeedsCompilation: no
-Packaged: 2018-07-04 19:58:11 UTC; jpearson
+Packaged: 2022-08-24 19:05:36 UTC; jpearson
 Repository: CRAN
-Date/Publication: 2018-07-05 13:00:02 UTC
+Date/Publication: 2022-08-25 08:30:06 UTC

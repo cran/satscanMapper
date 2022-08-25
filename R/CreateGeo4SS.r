@@ -189,7 +189,8 @@ CreateGeo4SS <- function(path  = NULL,
    overwrite_def  <- FALSE
    RV$overwrite   <- overwrite_def
       
-   if (is.null(overwrite) || is.na(overwrite) ) {
+     
+   if (is.null(overwrite) || is.na(overwrite[[1]][1]) ) {
       RV$overwrite   <- overwrite_def
    
    } else {
@@ -213,7 +214,7 @@ CreateGeo4SS <- function(path  = NULL,
    #
    path_def <- ""
    
-   if (is.null(path) || is.na(path)) {
+   if (is.null(path) || is.na(path[[1]][1])) {
       # no path provides
       RV$basePath <- path_def
       RV$v_Path   <- FALSE    # no path specified.
@@ -277,7 +278,7 @@ CreateGeo4SS <- function(path  = NULL,
    #
    casFN_def     <- ""
   
-   if (is.null(cas) || is.na(cas)) {          # Was parameter set by caller?
+   if (is.null(cas) || is.na(cas[[1]][1])) {          # Was parameter set by caller?
       # parameter not provided, set to "" (no name)
       RV$casFN   <- casFN_def                 # no - set defaults
       RV$v_Cas   <- FALSE
@@ -341,7 +342,7 @@ CreateGeo4SS <- function(path  = NULL,
    popFN_def   <- ""
    
    # was the pop= call parameter specified by caller?
-   if (is.null(pop) || is.na(pop)) {
+   if (is.null(pop) || is.na(pop[[1]][1])) {
       # parameter not provided, set to "" (no name)
       RV$popFN   <- popFN_def    # set defaults - no pop file
       RV$v_Pop   <- FALSE
@@ -405,7 +406,7 @@ CreateGeo4SS <- function(path  = NULL,
    RV$v_Geo_def<- FALSE
    
    # did caller provide a geo= parameter?
-   if (is.null(geo) || is.na(geo)) {
+   if (is.null(geo) || is.na(geo[[1]][1])) {
       # parameter not provided, set to ""
       RV$geoFN   <- geoFN_def     # set defaults = no GEO
       RV$v_Geo   <- RV$v_Geo_def
@@ -535,7 +536,7 @@ CreateGeo4SS <- function(path  = NULL,
    #
    censusYear_def <-  "2000"
    
-   if (is.null(censusYear) || is.na(censusYear)) {
+   if (is.null(censusYear) || is.na(censusYear[[1]][1])) {
       # parameter not provided, set to ""
       RV$censusYear  <- censusYear_def
    } else {
@@ -558,7 +559,7 @@ CreateGeo4SS <- function(path  = NULL,
    #
    header_def <- TRUE
    
-   if (is.null(header) || is.na(header) ) {
+   if (is.null(header) || is.na(header[[1]][1]) ) {
       header <- header_def
    } else {
       if (!is.logical(header)) {

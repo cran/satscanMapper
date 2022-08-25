@@ -8,7 +8,7 @@ set at the time the \var{satscanMapper} package was built and tested for release
 to CRAN.  The string contains the package name, version number and the date and
 time the package was built.
 
-"SaTScanMapper V1.0.1 - built 180630 at 6:08pm"
+"SaTScanMapper V1.0.2 - built 220823 at 8:08pm"
 
 }
 \usage{satscanMapper.Version()}

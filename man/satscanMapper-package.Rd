@@ -29,8 +29,8 @@ SaTScanMapper then adds the cluster labels and outlines as requested.
     \tabular{ll}{
       Package:  \tab satscanMapper\cr
       Type:     \tab Package\cr
-      Version:  \tab 1.0.1\cr
-      Date:     \tab 2018-06-30\cr
+      Version:  \tab 1.0.2\cr
+      Date:     \tab 2022-08-23\cr
       License:  \tab GPL-2\cr
       LazyLoad: \tab no\cr
     } 
@@ -55,8 +55,8 @@ Only the needed boundary data are loaded into memory.
 }
 
 \author{
-Jim Pearson \email{jpearson@statnetconsulting.com}\cr
-Maintainer: Jim Pearson \email{jpearson@statnetconsulting.com}\cr 
-Package compiled by Jim Pearson \email{jpearson@statnetconsulting.com}
+Jim Pearson \email{jbpearson353@gmail.com}\cr
+Maintainer: Jim Pearson \email{jbpearson353@gmail.com}\cr 
+Package compiled by Jim Pearson \email{jbpearson353@gmail.com}
 }
 

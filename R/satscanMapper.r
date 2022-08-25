@@ -71,6 +71,12 @@ debugFlag <- FALSE
 #              release testing.  outDir allows no output files to be 
 #              written, write to a dedicated directory, write to 
 #              the default directory.
+#   22/08/23 - Updated maintainers and authors email addresses.
+#            - Documented "report" call parameter is modified to reduce the run time for 
+#              CRAN submission to a summary report (report=FALSE).
+#            - Corrected call parameter checking to handle single variable is.na()
+#            - Updated all "Z-" line number comments to the correct line numbers.\
+#            - Reduce examples to meet CRANs time limitations.
 # 
 iRes <- require(SeerMapper)
 if (!iRes) {
@@ -384,7 +390,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
                            categ        = NULL,           # Optional (default = 7) 
                            title        = NULL,           # Optional (default = .prm filename)
                            pValue       = NULL,           # Optional (default = 0.05()
-                           report       = NULL,           # Optional (default = TRUE) 
+                           report       = NULL,           # Optional (default = TRUE)    # not implemented.
                            runId        = NULL,           # Optional (default = "")
                            bndyCol      = NULL,           # Optional (default = "grey50")
                            label        = NULL,           # Optional (default = TRUE)
@@ -424,7 +430,9 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #    report = is a logical value.  If TRUE, the package generates a text 
    #           report of the calculations and numerical information from 
    #           SaTScan (TM) related to the clusters and locations.
-   #           If FALSE, no report is created.  The default value is TRUE.
+   #           If TRUE both the map visualization and the text report are generated.
+   #           If FALSE, the text report is not generated.  The default value is TRUE.
+   #           
    #
    #    runId = is a character string that is appended to the result files basename when creating 
    #           the filenames for the output PDF and report test files.  This allows the same SaTScan (TM) 
@@ -634,15 +642,15 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #
    #  Verification Step 1 - Check ranges of subroutine call variables
    #
-   FNDError     <- FALSE      # indicator a fault error was found and execution can't continue
-   FNDWarn      <- FALSE      # indicator a warning message issues, but execution can continue
-   NumErrors    <- 0          # number of errors
-   NumWarns     <- 0          # number of warnings
-   
-   RateMapping  <- FALSE      # enable Rate Mapping map generation
-   NoRRFile     <- FALSE      # no RR file, work around it.
-   
-   DoOutput     <- TRUE       # Output control flag - TRUE do output.
+   FNDError     <- FALSE         # indicator a fault error was found and execution can't continue
+   FNDWarn      <- FALSE         # indicator a warning message issues, but execution can continue
+   NumErrors    <- 0             # number of errors
+   NumWarns     <- 0             # number of warnings
+      
+   RateMapping  <- FALSE         # enable Rate Mapping map generation
+   NoRRFile     <- FALSE         # no RR file, work around it.
+      
+   DoOutput     <- TRUE          # Output control flag - TRUE do output.
    
    PrmFileName  <- NULL          # PRM file name (dir, results file, extension)
    ColFileName  <- NULL          # Cluster Info file name (dir, results file, extension)
@@ -723,7 +731,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #
    #  resDir = 
    #
-   if (is.null(resDir) || is.na(resDir) || !is.character(resDir) || resDir == "") {
+   if (is.null(resDir) || is.na(resDir)[[1]][1] || !is.character(resDir) || resDir == "") {
        FNDError   <- TRUE
        NumErrors  <- NumErrors + 1
        xmsg       <- paste0("The required resDir= call argument has not been provided.")
@@ -734,7 +742,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #
    #  prmFile =
    #
-   if (is.null(prmFile) || is.na(prmFile) || !is.character(prmFile) || prmFile == "") {
+   if (is.null(prmFile) || is.na(prmFile)[[1]][1] || !is.character(prmFile) || prmFile == "") {
        FNDError   <- TRUE
        NumErrors  <- NumErrors + 1
        xmsg       <- paste0("The required prmFile= parameter has not been provided.")
@@ -749,11 +757,12 @@ satscanMapper <- function (resDir       = NULL,           # Required
    if (is.null(outDir) ) {  # outDir is NULL 
       outDir   <- resDir    # use resDir as the default value.
    }
-   if (is.na(outDir) )   {  # outDir is NA - no output - special case
+   outDir <- outDir[[1]][1]
+   if (is.na(outDir))   {  # outDir is NA - no output - special case
       outDir   <- NA        # special case.
       DoOutput <- FALSE
    } else {
-      outDir   <- as.character(outDir[[1]][1])
+      outDir   <- as.character(outDir)
       # must be a character string
       outDir   <- str_trim(outDir)    # trim leading and trailing blanks.
       if ( outDir == "" ) {     # outDir is an empty string "" - set to the current getwd() value.
@@ -899,13 +908,13 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #
    censusYear_def  <- "2000"
    
-   if (is.null(censusYear) || is.na(censusYear)) {
+   if (is.null(censusYear) || is.na(censusYear[[1]][1])) {
       # caller did not provide the censusYear call parameter
       censusYear <- censusYear_def
    
    } else {
-      censusYear <- as.character(censusYear)   # make character vector (can take numerics.
       censusYear <- censusYear[[1]][1]
+      censusYear <- as.character(censusYear)   # make character vector (can take numerics.
       
       if (censusYear != "2000" && censusYear != "2010") {
          # invalid census year value.
@@ -927,6 +936,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
       # runId not present - set to default
       runId <- runId_Def
    } else {
+      runId  <- runId[[1]][1]
       if ( is.na(runId) || !is.character(runId) || length(runId) <= 0) {
          # runId argument is NA or not correctly formated. Set to default value of "".
          xmsg        <- paste0('The runId call argument is set to NA, not a character string or empty.  runId set to the default of "".')
@@ -948,11 +958,12 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #
    pValue_Def <- 0.05
    
-   if (is.null(pValue) || is.na(pValue)) {
+   if (is.null(pValue) || is.na(pValue[[1]][1])) {
       # pValue is not provided - set to default
       pValue <- pValue_Def
    
    } else {
+      pValue <- pValue[[1]][1]
       if (!is.numeric(pValue) || pValue < 0.005 || pValue > 0.5) {
          # the pValue argument is set to NA, a non-numeric or out of range.
          xmsg     <- paste0("pValue call argument specified is not a numeric value or not within range of (0.005 to 0.5).\n",
@@ -977,7 +988,8 @@ satscanMapper <- function (resDir       = NULL,           # Required
       vTitle      <- orgPrmFile
    
    } else {
-      if (is.na(title) || !is.character(title) || nchar(title) <= 0 || length(title) <= 0) {
+      xtitle <- title[[1]][1]
+      if (is.na(xtitle) || !is.character(xtitle) || nchar(xtitle) <= 0 || length(xtitle) <= 0) {
          # title is set to NA, not a character vector or empty.
          xmsg     <- paste0("The title call argument is NA, a non-character string, a non-vector, or empty.\n",
                 "The title is set to the prmFile name of ",prmFile,"\n")
@@ -1011,11 +1023,12 @@ satscanMapper <- function (resDir       = NULL,           # Required
    label_def <- TRUE
    vLabel    <- label_def
    
-   if (is.null(label) || is.na(label) ) {
+   if (is.null(label) || is.na(label[[1]][1]) ) {
       # no label argument provided or set to NA
       vLabel <- label_def
    
    } else {
+      label   <-  label[[1]][1]
       if ( !is.logical(label) ) {
          # label must be TRUE or FALSE logical
          xmsg <- paste0("The label call argument is a non-logical variable.\n",
@@ -1040,6 +1053,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
       bndyCol <- bndyCol_def
    
    } else {
+      bndyCol   <-  bndyCol[[1]][1]
       # bndyCol can be either TRUE/FALSE (on or off) or a color.
    
       if (is.na(bndyCol)) {
@@ -1113,10 +1127,11 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #
    locO_EMap_def <- TRUE
    
-   if (is.null(locO_EMap) || is.na(locO_EMap)) {
+   if (is.null(locO_EMap) || is.na(locO_EMap[[1]][1])) {
       # no argument provides or it is set to NA
       locO_EMap <- locO_EMap_def
    } else {
+      locO_EMap  <- locO_EMap[[1]][1]
       if (!is.logical(locO_EMap)) {
          # locO_EMap  is not a logical variable
          xmsg        <- paste0("The locO_EMap call argument is not a logical variable.  The default value of ",locO_EMap_def," will be used.\n")
@@ -1124,8 +1139,6 @@ satscanMapper <- function (resDir       = NULL,           # Required
          FNDWarn     <- TRUE
          NumWarns    <- NumWarns + 1
          locO_EMap   <- locO_EMap_def
-      } else {
-         locO_EMap   <-  locO_EMap[[1]][1]  # get first value
       }
    }
    
@@ -1134,10 +1147,11 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #
    clusO_EMap_Def <- TRUE
    
-   if (is.null(clusO_EMap) || is.na(clusO_EMap)) {
+   if (is.null(clusO_EMap) || is.na(clusO_EMap[[1]][1])) {
       # no argument provides or it is set to NA
       clusO_EMap <- clusO_EMap_Def
    } else {
+      clusO_EMap <- clusO_EMap[[1]][1]
       if (!is.logical(clusO_EMap)) {
          # clusO_EMap  is not a logical variable
          xmsg        <- paste0("The clusO_EMap call argument is not a logical variable.  The default value of ",clusO_EMap_Def," will be used.\n")
@@ -1145,8 +1159,6 @@ satscanMapper <- function (resDir       = NULL,           # Required
          FNDWarn     <- TRUE
          NumWarns    <- NumWarns + 1
          clusO_EMap  <- clusO_EMap_Def
-      } else {
-         clusO_EMap  <-  clusO_EMap[[1]][1]  # get first value
       }
    }
    
@@ -1178,15 +1190,36 @@ satscanMapper <- function (resDir       = NULL,           # Required
       outline <- outline_Def
       
    } else {
+      outline    <- outline[[1]][1]
       if (is.na(outline) || !is.logical(outline)) {
          xmsg     <- paste0("The outline call argument is not a logical variable. The default of ",outline_Def," will be used.\n")
          message(xmsg,call.=FALSE)
          FNDWarn  <- TRUE
          NumWarns <- NumWarns + 1
+         outline <- outline_Def
       }
    }
    callVarList$outline <- outline
    
+   #
+   # report
+   #
+   def_report <- TRUE
+   
+   if (is.null(report))  report <- def_report
+   
+   report <- report[[1]][1]
+    
+   if (is.na(report) || !is.logical(report)) {
+      xmsg <- paste0("The report call argument is not a logical variable or has a value of NA. The default of "	 , def_report," will be used.\n")
+      message(xmsg,call.=FALSE)
+      FNDWarn  <- TRUE
+      NumWarns <- NumWarns+1
+      report   <- def_report
+   }
+   
+   callVarList$report <- report
+
    #
    #  Future call parameters:
    #
@@ -1524,7 +1557,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
                # -1   Date      yyyy/mm/dd
                    
                xDate <- try( as.Date(yP01,"%Y/%m/%d" ) )
-               if (is.null(xDate) || is.na(xDate) || class(xDate) == "try-error"  ) {
+               if (is.null(xDate) || is.na(xDate[[1]][1]) || is(xDate,"try-error") ) {
                   # error in validating/converting date
                   #  Error message
                   xmsg      <- paste0("The following date in the *.PRM file is not a valid DATE format: ",PrmList[inx,"Orig"])
@@ -2121,7 +2154,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
       data(tr99_data,envir = environment(),package="satscanMapper")
    }
    
-   #cat("data sets loaded for satscanMapper Z-2117 .\n")
+   #cat("data sets loaded for satscanMapper Z-2132 .\n")
   
    #
    #  The above loads the three working table indexes:
@@ -2153,14 +2186,14 @@ satscanMapper <- function (resDir       = NULL,           # Required
    
    if (censusYear == "2010")  yF <- 2
    
-   #cat("Set up st99.index structure for run Z- .\n")
+   #cat("Set up st99.index structure for run Z-2164 .\n")
    
    st99.index       <- st99_data
    st99.index$ID    <- row.names(st99.index)
    st99.index$stID  <- as.character(st99.index$ID)
    #stAllList       <- st99.index$stID
       
-   #cat("st99.index updated - Z-2167 \n")
+   #cat("st99.index updated - Z-2171 \n")
    #print(st99.index)
    
    
@@ -2342,7 +2375,6 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #
    ####
 
-   ########
    #
    #   FILES  Locations:
    #
@@ -2354,18 +2386,6 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #           (CHANGE to your environment)
    #
    
-   #print("Call parameters:\n")
-   #print(paste("resDir           :",resDir,sep=""))
-   #print(paste0("outDir           :",outDir))
-   #
-   #  Set SatScan's output base filename to be used by the program - where:
-   #
-   #print(paste("prmFile          :",prmFile,sep=""))
-   #
-   #print(paste("Prm (full)       :",wPrmFileName,sep=""))
-   #print(paste("Cluster Info     :",wColFileName,sep=""))
-   #print(paste("Location Info    :",wGisFileName,sep=""))
-   #print(paste("RR Estimated Info:",wRRFileName,sep=""))
    #
    callVarList$ColFileName <- wColFileName              # duplicate effort.
    callVarList$GisFileName <- wGisFileName
@@ -2817,7 +2837,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #
    ####
    
-   #cat("ColTable Z-2312 :\n")
+   #cat("ColTable Z-2828 :\n")
    #print(head(ColTable))
    #print(table(ColTable$Cat))
    #print(table(ColTable$Col))
@@ -2843,7 +2863,6 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #  Read the GIS File from SatScan
    #
    #  *.gis.dbf   GIS file format (columns)  
-   #
    #
    #  1 Location_ID
    #  2 Cluster_number  ***
@@ -3052,7 +3071,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #
    ####
    
-   #cat("Gis/Loc Table Z-2524 :\n")
+   #cat("Gis/Loc Table Z-3063 :\n")
    #print(head(GisTable))
    #print(table(GisTable$LocCat))
    #print(table(GisTable$LocCol))
@@ -3221,7 +3240,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
    
    rPM       <- SeerMapper::SM_GlobInit()  # initialize Seer Mapper variable named lists.
    
-   #cat("completed SM_GlobInit Z-3237 .\n")
+   #cat("completed SM_GlobInit Z-3232 .\n")
    
    #
    #  Now we have the rPM named list to start filling in.
@@ -3269,7 +3288,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
    
    rPM$mLegendFlag    <- FALSE   # dont do legends
    
-   #cat("Basic SeerMapper callparms set - Z-3285 - LocIDType:",LocIDType," \n")
+   #cat("Basic SeerMapper callparms set - Z-3280 - LocIDType:",LocIDType," \n")
    
    mapB               <- "STATE"  #### temp until option added.
    
@@ -3380,7 +3399,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #
    #  We have the ClusLocList, GisLocList, and RRLocList to compare.
    #
-   #cat("Setup state and location lists - Z-3400 \n")
+   #cat("Setup state and location lists - Z-3391 \n")
       
    StateListDAll  <- sort(unique(c(ColStateList,GisStateList,RRStateList)))
    StateListData  <- sort(unique(c(ColStateList,GisStateList)))
@@ -3416,7 +3435,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
    
    idList          <- LocListDAll                   # all Loc_IDs from Cluster, Loc and RR files.
    lenIdList       <- length(idList)
-   #cat("Number of Locations IDs found Z-3432 :",lenIdList,"\n")
+   #cat("Number of Locations IDs found Z-3427 :",lenIdList,"\n")
    
    dataList        <- rep("white",length(idList))
    hDataList       <- rep(NA,length(idList))
@@ -3444,7 +3463,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
    
    row.names(dataMapDF) <- dataMapDF$ID
 
-   #cat("dim(dataMapDF) Z-3460 :",dim(dataMapDF),"\n")
+   #cat("dim(dataMapDF) Z-3455 :",dim(dataMapDF),"\n")
    
    #cat("dataMapDF - init-empty:\n")
    #print(str(dataMapDF))
@@ -3558,7 +3577,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
    
    dataMapDF <- rPM$dataMapDF   # restore dataMapDF is changed in SM_Build
    
-   #cat("completed SM_Build Z-3574 .\n")
+   #cat("completed SM_Build Z-3569 .\n")
    
    idList <- dataMapDF$ID   # get updated ID Lists after SM_Build edit.
    lenIdList <- length(idList)
@@ -3699,44 +3718,8 @@ satscanMapper <- function (resDir       = NULL,           # Required
    ##
    ##   This verification is done in SeerMapper = SM_Build - should it be done here??
    ##
-   ##
-   #LocFipsAll   <- str_sub(tr99.index$ID,1,LocIDType)  # get list of all valid fips at the correct level
-   #LocFipsAll   <- unique(LocFipsAll)
-   #
-   #fipsMatch    <- match(LocListDAll,LocFipsAll)
-   #fipsMatchNA  <- is.na(fipsMatch)    # true = no match
-   #
-   #if (any(fipsMatchNA)) {
-   #   BadList    <- LocListDAll[fipsMatchNA]
-   #   xmsg       <- paste0("The LOC_IDs contain FIPS codes that do not exist in the boundary info.\n",
-   #                          "They are (",length(BadList),"):\n")
-   #   warning(xmsg,call.=FALSE)
-   #   xmsg       <- paste0(BadList,collapse=", ")
-   #   warning(xmsg,call.=FALSE)                       
-   #   xmsg       <- paste0("Please review the location IDs used and correct. Verify the right census year was specified.\n")
-   #   warning(xmsg,call.=FALSE)
-   #   FNDError   <- TRUE
-   #   NumErrors  <- NumErrors + 1
-   #   # don't shut down - ignore area.
-   #}
-   #
-   #####
-   #
-   #if (FNDError) {
-   #   xmsg     <- paste0("Error(s) found in the LOC_ID values in the results.  Run Terminated.\n")
-   #   stop(xmsg, call.=FALSE)
-   #}
-   #
-   ##
-   ######
    
-   #####
-   #
-   #   Identify level of data being used for the location ID
-   #
-   #####
    
- 
    #####
    #
    #  Identify te states covered by the data.
@@ -3744,7 +3727,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #   From the LocListDAll, get the list of States involved.
    #
 
-   #cat("List of states involved in the analysis Z-3282 :",StateListDAll,"\n")
+   #cat("List of states involved in the analysis Z-3755 :",StateListDAll,"\n")
    
    st99.index$use <- FALSE
    st99.index[StateListDAll,]$use <- TRUE     # mark used states in st99.index table
@@ -3857,7 +3840,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
    # Init and Collect working data.frame (wk99)
    wk99 <- NULL
    
-   #cat("LocIDType Z-3841 :",LocIDType,"  idList:\n")
+   #cat("LocIDType Z-3868 :",LocIDType,"  idList:\n")
    #print(head(idList))
    
    if (LocIDType == 2) {
@@ -3947,7 +3930,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
   
    }
    
-   #cat("initial wk99 table Z-3525 build from boundary tables not data.\n")
+   #cat("initial wk99 table Z-3958 build from boundary tables not data.\n")
    #print(str(wk99))
    #print(head(wk99,15))
    #cat("typeof:",typeof(wk99),"  class:",class(wk99),"\n")
@@ -4064,7 +4047,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
  
    #
    ####
-   #cat("Mapping Level Z-4065 - IDName:",IDName,"\n")   
+   #cat("Mapping Level Z-4075 - IDName:",IDName,"\n")   
    #cat("SeerMapper Parameters - regionB:",vRegionB,"  stateB:",vStateB,"  seerB:",vSeerB,"  countyB:",vCountyB,"  tractB:",vTractB,"\n")
    
    ####
@@ -4100,23 +4083,6 @@ satscanMapper <- function (resDir       = NULL,           # Required
       vH <- 7.5
    }
    #cat("aspect:",aspect,"  vW:",vW,"  vH:",vH,"\n")
-   
-   
-   
-   #wPaper  <- "letter"
-   #if (aspect>1.8) {
-   #   wPaper <- "legal"   # vertical long page
-   #}
-   #if (aspect>1.4) {
-   #   wPaper <- "letter"  # vertical page
-   #}
-   #if (aspect<0.72) {
-   #   wPaper <- "USr"     # letter rotated landscape
-   #}
-   #if (aspect<0.55) {     # legal rotated.
-   #  wPaper <- "USr"
-   #}
-   #cat("wPaper Z-3632 size:",wPaper,"  aspect:",aspect,"\n")
    
    #
    #
@@ -4196,7 +4162,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
    # Bad LOC_ID in col - (centroid area)
    
    xx <- setdiff(ColTable$LOC_ID,wk99$ID)  # find items in cluster loc_id list that are not in xx99.index
-   #cat("compare cluster ID lists Z-3760 - ",length(ColTable$LOC_ID), " vs. ", length(wk99$ID),"\n")
+   #cat("compare cluster ID lists Z-4207 - ",length(ColTable$LOC_ID), " vs. ", length(wk99$ID),"\n")
    
    # should be identical - since wk99$ID was derived from the data and LocListDAll ... 
    
@@ -4211,7 +4177,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
    rm(xx)
    
    xM             <- match(GisTable$LOC_ID,wk99$ID)   # find items in location (gis) loc_id list that are ot in xx99.index
-   #cat("compare location ID lists Z-3727 - ",length(GisTable$LOC_ID)," vs. ",length(wk99$ID),"\n")
+   #cat("compare location ID lists Z-4222 - ",length(GisTable$LOC_ID)," vs. ",length(wk99$ID),"\n")
    
    # should be identical - since wk99$ID was derived from the data and LocListDAll ... 
    
@@ -4246,7 +4212,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #  the beginning.
    #
    
-   #cat("Start of mapping Z-3908 \n")
+   #cat("Start of mapping Z-4257 \n")
 
    ########
    ###
@@ -4342,7 +4308,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #cat("Number of ellipse/circles:",EllipseSetBaseLen,"\n")
    #cat("EllipseSetBase:\n")
    #print(EllipseSetBase)
-   #cat("EllipseSetBase - typeof:",typeof(EllipseSetBase),"  class:",class(EllipseSetBase)," Z-3987 \n")
+   #cat("EllipseSetBase - typeof:",typeof(EllipseSetBase),"  class:",class(EllipseSetBase)," Z-4353 \n")
    
    #
    # Calculate the X, Y coordinates for the label, and back fill for no circle dimensions
@@ -4415,7 +4381,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
 
    ###
    
-   #cat("EllipseSetBase Z-4400 \n")
+   #cat("EllipseSetBase Z-4426 \n")
    #print(str(EllipseSetBase))
    #print(head(EllipseSetBase))
    
@@ -4563,7 +4529,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
    #
    #  page 2 and forward.
    #
-   #cat("page 2 - maps Z-4565 \n")
+   #cat("page 2 - maps Z-4574 \n")
 
    data_data_sel <- MV$data_data_sel
    wk99IDs       <- wk99$ID
@@ -4681,25 +4647,7 @@ satscanMapper <- function (resDir       = NULL,           # Required
       
       #  final adjustments
       
-      #cat("table cat and col Z-4113 - cluster  dim(wk99):",dim(wk99),"\n")
-      #print(table(wk99$ClusCat))
-      #print(table(wk99$ClusCol))
-      #cat("table cat and col - local.\n")
-      #print(table(wk99$LocCat))
-      #print(table(wk99$LocCol))
-  
-      #cat("Col and Cat set.\n")
-  
-      #rPM$dataMapDF$ID  <- wk99$ID    # NO NO - wk99 is derived from the data and dataMapDF.
-      
-      #cat("wk99 before mapping.\n")
-      #print(str(wk99))
-      #print(head(wk99))
-      
-      #cat("dataMapDF before mapping.\n")
-      #print(str(dataMapDF))
-      #print(head(dataMapDF))
-      
+           
       #  dataMapDF represents the locations in the Cluster and Location tables
       #  wk99      represents the total area to be mapped (at same level be may have more areas
       #  If dataMapDF areas don't map to boundary - they are deleted from dataMapDF
@@ -4742,29 +4690,14 @@ satscanMapper <- function (resDir       = NULL,           # Required
             cat("LocIDType :",LocIDType,"\n")
             cat("vTitle    :",vTitle,   "\n")
          }
-         #cat("colnames(wk99):",colnames(wk99),"\n")
-         #print(str(wk99))
-         #print(head(wk99,10))
-         
-         #cat("colors from wk99:\n")
-         #print(table(wk99$LocCol))
-         #print(table(wk99$ClusCol))
-         #print(wk99[,c("ID","LocCol","ClusCol")])
-         
+             
          #cat("len dataMapDF:",dim(dataMapDF)[1],"   len wk99:",dim(wk99)[1],"\n")
    
          #cat("assign LocCol to dataMapDF.\n")
          dataMapDF[idList2,"data"]    <- wk99[idList2,"LocCol"]         # set data to wk99 local color.
          
-         #print(str(dataMapDF))
-	 #print(head(dataMapDF,10))
-	 #print(table(dataMapDF$data))
-         
          #cat("assign colors to data_data_sel.\n")
          data_data_sel[wk99IDs,"col"] <- wk99[wk99IDs,"LocCol"]       # full geo data list.
-         
-         #print(str(data_data_sel))
-         #print(head(data_data_sel,10))
          
          #cat("saving data into rPM.\n")
          rPM$dataMapDF       <- dataMapDF
@@ -4804,13 +4737,6 @@ satscanMapper <- function (resDir       = NULL,           # Required
          
          dataMapDF[idList2,"data"]    <- wk99[idList2,"ClusCol"]
          
-         #cat("Set cluster colors into dataMapDF$data.\n")
-         #cat("dim(dataMapDF):  ",dim(dataMapDF),      "  dim(wk99):  ",dim(wk99),"\n")
-         #cat("names(dataMapDF):",names(dataMapDF),"\n")
-         #cat("     names(wk99):",names(wk99),"\n")
-         #cat("table(dataMapDF$data):\n")
-         #print(table(dataMapDF$data))
-        
          MV$data_data_sel    <- data_data_sel
          rPM$dataMapDF       <- dataMapDF
          
@@ -4844,24 +4770,25 @@ satscanMapper <- function (resDir       = NULL,           # Required
    dev.off()    # close PDF file..
    
    ############################
-   ############################
 
-   #print("Starting text report")
+   if (report) { 
+   
+      #print("Starting text report")
 
-   #
-   # If call TextRepHdr_Files(TxtCon,TypeForm,YearList,PopInput,CasInput,ColInput,GisInput, RateFile) 
-   #
+      #
+      # If call TextRepHdr_Files(TxtCon,TypeForm,YearList,PopInput,CasInput,ColInput,GisInput, RateFile) 
+      #
+ 
+      TractN <- "tracts_00"
+      CountyN<- "county_00"
+      HsaN   <- "hsa_00"
+      if (censusYear == "2010") {
+         TractN <- "tracts_10"
+         CountyN<- "county_10"
+         HsaN   <- "hsa_10"
+      }
    
-   TractN <- "tracts_00"
-   CountyN<- "county_00"
-   HsaN   <- "hsa_00"
-   if (censusYear == "2010") {
-      TractN <- "tracts_10"
-      CountyN<- "county_10"
-      HsaN   <- "hsa_10"
-   }
-   
-   DataTypeLit <- switch(as.character(LocIDType),
+      DataTypeLit <- switch(as.character(LocIDType),
                    "2" = "State Location IDs",
                    "3" = "State/HSA Location IDs",
                    "5" = "State/County Location IDs",
@@ -4871,1542 +4798,1231 @@ satscanMapper <- function (resDir       = NULL,           # Required
    
   
    
-   ########
-   ###
-   ###   Repeat loops to generate a text report of the detailed data
-   ###   used in the mapping above.
-   ###
-
-   # Open output text file.
-   #cat("Text: Overview Parameters\n")
-
-   TxtCon <- file(OutputFNtxt,"w")    # output to text file
    
-   #TxtCon <- stdout()     # output to screen instead of file 
-
-   writeLines("SatScan-R Mapping Program - Report",con=TxtCon)
-   writeLines(" ",con=TxtCon)
-   writeLines(paste("   software version -> ",SSMVersion,sep=""),con=TxtCon)
-   writeLines(" ",con=TxtCon)
-   writeLines(date(),con=TxtCon)
-   writeLines(" ",con=TxtCon)
-   writeLines(" ",con=TxtCon)
-   writeLines(DataTypeLit,con=TxtCon)
-   writeLines(" ",con=TxtCon)
-   writeLines(paste0("Census Year:",censusYear),con=TxtCon)
-   writeLines(" ",con=TxtCon)
-   writeLines(TypeForm,con=TxtCon)
-   writeLines(" ",con=TxtCon)
-   writeLines(YearList,con=TxtCon)
-   writeLines(" ",con=TxtCon)
-   writeLines(paste0("Shape type:",SType),con=TxtCon)
-   writeLines(" ",con=TxtCon)
-   
-    
-   writeLines(" ",con=TxtCon)
-   writeLines("Data Source Files:",con=TxtCon)
-   writeLines(" ",con=TxtCon)
-   writeLines("  SatScan Results files:",con=TxtCon)
-   writeLines(paste("     ",wColFileName,sep=""),con=TxtCon)
-   writeLines(paste("     ",wGisFileName,sep=""),con=TxtCon)
-   writeLines(paste("     ",wRRFileName,sep=""),con=TxtCon)
-   
-   #writeLines(" ",con=TxtCon)
-   writeLines(" ",con=TxtCon)
-
-   # If call TextRepOptions(TxtCon,LocBoundary,StateList) 
-
-   writeLines(" ",con=TxtCon)
-   writeLines("General Options:",con=TxtCon)
-   writeLines(" ",con=TxtCon)
-   writeLines(paste("   Run Identifier for Output Files:",runId,sep=""),con=TxtCon)
-   writeLines(" ",con=TxtCon)
-   writeLines("   Data references the following state(s) (Fips & Name): ",con=TxtCon)
-   for (ind in 1:length(StateListData)) {
-      xstr <- as.character(st99.index[StateListData[ind],"stName"])   # print list of State Names.
-      writeLines(paste("      ",StateListData[ind],"  ",xstr,sep=""),con=TxtCon)
-   }
-   #writeLines(" ",con=TxtCon)
-   writeLines(" ",con=TxtCon)
-   
-   writeLines(paste("Number of cluster in *.col.dbf file:", NumClusCol,"."),con=TxtCon)
-   writeLines(paste("Number of cluster in *.gis.dbf file:", NumClusGis,"."),con=TxtCon)
-   writeLines(" ",con=TxtCon)
-   writeLines(paste("Number of locations referenced in the data:", length(LocListData),"."),con=TxtCon)
-   writeLines(" ",con=TxtCon)
-   writeLines(" ",con=TxtCon)
-
-   # Cluster Mapping Options:   
-   writeLines("Cluster Mapping Options:",con=TxtCon)
-   writeLines(" ",con=TxtCon)
-   writeLines(paste("   Number of Categories     :",categ,sep=""),con=TxtCon)
-   writeLines(paste("   Cluster Map Title        :",vTitle,sep=""),con=TxtCon)
-   writeLines(paste("   Census Tract Border Color:",bndyCol,sep=""),con=TxtCon)
-   writeLines(paste("   Draw Cluster Outlines    :",outline,sep=""),con=TxtCon)
-   writeLines(paste("   Label Cluster Outlines   :",label,sep=""),con=TxtCon)
-   writeLines(paste("   Location Obs/Exp Ratio Map   :",locO_EMap,sep=""),con=TxtCon)
-   writeLines(paste("   Cluster Obs/Exp Ratio Map    :",clusO_EMap,sep=""),con=TxtCon)
-   
-   writeLines(" ",con=TxtCon)
-   writeLines(" ",con=TxtCon)
-   
-   writeLines("Obs/Exp Ratio Categories:",con=TxtCon)
-   xx <- capture.output(print(GisTableCat,row.names=FALSE,digits=8,right=FALSE))
-   writeLines(xx ,con=TxtCon)
-   #writeLines(" ",con=TxtCon)
-   writeLines(" ",con=TxtCon)
-   
-   writeLines(" ",con=TxtCon)
-   
-   # If call  TextRepClus(TxtCon, categ, ClusLocMap, ClusClusMap, ClusClusLab, GisTableCat)  
-   
-   #  Build US header variables
-   USRes              <- NULL
-   USRes$TStates      <- us99.index$states
-   #USRes$THsas        <- us99.index$hsas
-   USRes$TCounty      <- us99.index$county
-   USRes$TTracts      <- us99.index$tracts
-   # format
-   USRes$LTStates     <- sprintf("%8i",USRes$TStates)
-   #USRes$LTHsas       <- sprintf("%8i",USRes$THsas)
-   USRes$LTCounty     <- sprintf("%8i",USRes$TCounty)
-   USRes$LTTracts     <- sprintf("%8i",USRes$TTracts)
-   
-   #cat("USRes - typeof:",typeof(USRes),"  class:",class(USRes)," Z-4947 \n")
- 
-   ####
-   #
-   #   Loop through clusters and report statistics on Cluster Info, Location Info
-   #
-   ####
-   #cat("Loop through cluster and build report stats Z-4954 .\n")
-   
-   ESet       <- EllipseSetBase
-   ESet_L     <- dim(ESet)[1]
-   
-   if (EUpValue) {
-   
-      writeLines(paste0("Number of clusters found with P_VALUE < 0.05 = ",ESet_L)) 
-      writeLines("Only clusters are reported when location (gis) records are available for the cluster.")
-      writeLines(" ") 
-   } else {
-      writeLines("The Cluster Results P_VALUE data is missing. All cluster mapped.")
-      writeLines(paste0("Number of clusters mapped = ",ESet_L)) 
-      writeLines(" ") 
-   }
-   ####
-   #
-   #  Changes in St/Co, St/Co/Place, and Location reports.
-   #
-   #  To support the tiered report, all St/Co, St/Co/Place and Location data frames for 
-   #  each cluster are collected and saved for one cycle.
-   #
-   #  As each tier level is requested and generated, the matching rows in the data frames
-   #  will be pulled out and printed.
-   #
-   #  If the older reports are also requested, then the 
-   #  report will generated using the same data.frames for the cluster.
-   
-   ####
-   
-   ####
-   #
-   #  Loop through the cluster data, print it and pull the location information
-   #  again and print it.
-   #
-   ####
-   
-   TotalHdrUS        <- "  US --     TotSts  TotCnty  TotTrts"
-   writeLines(TotalHdrUS,con=TxtCon)
-   USRes$Lead   <- "         "
-   #str(USRes)
- 
-   cat(unlist(USRes[c("Lead","LTStates","LTCounty","LTTracts")]),"\n",sep=" ",file=TxtCon)
-   writeLines(" ",con=TxtCon)
-   
-   #
-   #  Essentually - EllipseSetBase is the main list of Clusters and Years.
-   #
-   
-   if ( ESet_L > 0 ) {
-      # have clusters..
+      ########
+      ###
+      ###   Repeat loops to generate a text report of the detailed data
+      ###   used in the mapping above.
+      ###
       
-      for (ind in c(1:ESet_L))  {
-         
-         # loop through cluster one by one.
-         # pull together - Cluster Data
-         #cat("Text : Cluster Number : ",ind,"\n")
-         
-         # Pull off one cluster record (into three sub-records for printing.)
-         
-         ESWork1          <- NULL
-         ESWork1          <- ESet[ind,c("StrDate","EndDate","NUMBER_LOC","LLR","P_VALUE","NYr","HL")]
-         
-         ESWork2          <- NULL
-         ESWork2          <- ESet[ind,c("OBSERVED","EXPECTED","ODE","REL_RISK","Cat")]
-    
-         ESWork3          <- NULL
-         if (CoordinatesType == 0) {
-            ESWork3          <- ESet[ind,c("LOC_ID","E_MAJOR","E_MINOR","E_ANGLE","X","Y","t_X","t_Y")]
-         } else {
-            ESWork3          <- ESet[ind,c("LOC_ID","E_MAJOR","E_MINOR","E_ANGLE","LATITUDE","LONGITUDE","t_X","t_Y")]
-         }
-         # pull together - Location Data for Cluster
-         ClusNum          <- ColTable$CLUSTER[ind]
-          
-          # Format numerical values - numeric -> character
-         ESWork1$LLR      <- sprintf("%.3f",ESWork1$LLR)
-         ESWork1$P_VALUE  <- sprintf("%.6f",ESWork1$P_VALUE)
-        
-         ESWork2$EXPECTED <- sprintf("%.3f",ESWork2$EXPECTED)
-         ESWork2$ODE      <- sprintf("%.3f",ESWork2$ODE)
-         ESWork2$REL_RISK <- sprintf("%.3f",ESWork2$REL_RISK)
-         
-
-         # Get list of locations for this cluster area
-         GisList          <- GisTable[GisTable$CLUSTER == ClusNum,]  
-         
-         #cat("GisList colnames:",colnames(GisList)," Z-4682 \n")
-
-         GLGOrder         <- seq(1:length(GisList$Cluster))  # no sort order.
-        
-         # set HIGH or LOW indicator for Cluster in GisList (convert from numeric to characters)
-         if (ESWork1$HL < 0) {
-            # Indicate Cluster is a LOW cluster and order locations Low to High
-            ESWork1$HL    <- as.character("LOW ")
-            GLGOrder      <- order(GisList$LocCat,decreasing=T) 
-         } else {
-            if (ESWork1$HL > 0) {
-               # Indicate Cluster is a HIGH cluster and order locations High to Low.
-               ESWork1$HL <- as.character("HIGH")
-               GLGOrder   <- order(GisList$LocCat,decreasing=F)
-            }
-         } 
-         
-         #cat("GLGOrder:",GLGOrder,"\n")
-          
-         ####
-         #
-         # Start text report for this cluster
-         #
-         ####
-          
-         #  Cluster Statistics.
-         #cat("Text : Cluster Statistics.\n")
-          
-         writeLines(paste("CLUSTER # ",ClusNum," Details:",sep=""),con=TxtCon)
-         writeLines("",con=TxtCon)
+      # Open output text file.
+      #cat("Text: Overview Parameters\n")
+      
+      TxtCon <- file(OutputFNtxt,"w")    # output to text file
+      
+      #TxtCon <- stdout()     # output to screen instead of file 
+      
+      writeLines("SatScan-R Mapping Program - Report",con=TxtCon)
+      writeLines(" ",con=TxtCon)
+      writeLines(paste("   software version -> ",SSMVersion,sep=""),con=TxtCon)
+      writeLines(" ",con=TxtCon)
+      writeLines(date(),con=TxtCon)
+      writeLines(" ",con=TxtCon)
+      writeLines(" ",con=TxtCon)
+      writeLines(DataTypeLit,con=TxtCon)
+      writeLines(" ",con=TxtCon)
+      writeLines(paste0("Census Year:",censusYear),con=TxtCon)
+      writeLines(" ",con=TxtCon)
+      writeLines(TypeForm,con=TxtCon)
+      writeLines(" ",con=TxtCon)
+      writeLines(YearList,con=TxtCon)
+      writeLines(" ",con=TxtCon)
+      writeLines(paste0("Shape type:",SType),con=TxtCon)
+      writeLines(" ",con=TxtCon)
+      
        
-         names(ESWork1) <- c("Start Date","End Date","Number of Locs","LLR","P_Value","Num_Years","High/Low")         
-         names(ESWork2) <- c("Observed","Expected","Obs/Exp","Relative Risk","Category")         
-         names(ESWork3) <- c("Centroid_ID","E_Major","E_Minor","E_Angle","Org_X","Org_Y","Tran_X","Tran_Y")         
+      writeLines(" ",con=TxtCon)
+      writeLines("Data Source Files:",con=TxtCon)
+      writeLines(" ",con=TxtCon)
+      writeLines("  SatScan Results files:",con=TxtCon)
+      writeLines(paste("     ",wColFileName,sep=""),con=TxtCon)
+      writeLines(paste("     ",wGisFileName,sep=""),con=TxtCon)
+      writeLines(paste("     ",wRRFileName,sep=""),con=TxtCon)
       
-         #xx <- capture.output(ESWork1)
-         xx <- paste("        ",capture.output(print(ESWork1,row.names=FALSE)),sep="")
-         writeLines(xx,con=TxtCon)
-        
-         #xx <- paste("       ",capture.output(ESWork2),sep="")
-         xx <- paste("            ",capture.output(print(ESWork2,row.names=FALSE)),sep="")
-         writeLines(xx,con=TxtCon)
-        
-         #xx <- paste("       ",capture.output(ESWork3),sep="")
-         xx <- paste("            ",capture.output(print(ESWork3,row.names=FALSE)),sep="")
-         writeLines(xx,con=TxtCon)
-        
-        
-         #  Catagorize locations based on Obs_Exp ratio value
-         #
-         #  End of cluster header and data
-         #
-         #####
-   
-         #####
-         #
-         #  Now gather the data.frames for the location, state/county, and state/county/place census tract
-         #   reports.
-         #
-         #####
-                   
-         ####
-         #
-         #  Get Location rows related to cluster
-         #
-         #  Add state, county, place names information from tr99.index (wk99)
-         #    possible layouts:  state only,  state & county only,  state county place tract.
-         #    written for s c t only, add extra set ups.
-         #
-         ####
+      #writeLines(" ",con=TxtCon)
+      writeLines(" ",con=TxtCon)
+      
+      # If call TextRepOptions(TxtCon,LocBoundary,StateList) 
+      
+      writeLines(" ",con=TxtCon)
+      writeLines("General Options:",con=TxtCon)
+      writeLines(" ",con=TxtCon)
+      writeLines(paste("   Run Identifier for Output Files:",runId,sep=""),con=TxtCon)
+      writeLines(" ",con=TxtCon)
+      writeLines("   Data references the following state(s) (Fips & Name): ",con=TxtCon)
+      for (ind in 1:length(StateListData)) {
+         xstr <- as.character(st99.index[StateListData[ind],"stName"])   # print list of State Names.
+         writeLines(paste("      ",StateListData[ind],"  ",xstr,sep=""),con=TxtCon)
+      }
+      #writeLines(" ",con=TxtCon)
+      writeLines(" ",con=TxtCon)
+      
+      writeLines(paste("Number of cluster in *.col.dbf file:", NumClusCol,"."),con=TxtCon)
+      writeLines(paste("Number of cluster in *.gis.dbf file:", NumClusGis,"."),con=TxtCon)
+      writeLines(" ",con=TxtCon)
+      writeLines(paste("Number of locations referenced in the data:", length(LocListData),"."),con=TxtCon)
+      writeLines(" ",con=TxtCon)
+      writeLines(" ",con=TxtCon)
+      
+      # Cluster Mapping Options:   
+      writeLines("Cluster Mapping Options:",con=TxtCon)
+      writeLines(" ",con=TxtCon)
+      writeLines(paste("   Number of Categories     :",categ,sep=""),con=TxtCon)
+      writeLines(paste("   Cluster Map Title        :",vTitle,sep=""),con=TxtCon)
+      writeLines(paste("   Census Tract Border Color:",bndyCol,sep=""),con=TxtCon)
+      writeLines(paste("   Draw Cluster Outlines    :",outline,sep=""),con=TxtCon)
+      writeLines(paste("   Label Cluster Outlines   :",label,sep=""),con=TxtCon)
+      writeLines(paste("   Location Obs/Exp Ratio Map   :",locO_EMap,sep=""),con=TxtCon)
+      writeLines(paste("   Cluster Obs/Exp Ratio Map    :",clusO_EMap,sep=""),con=TxtCon)
+      
+      writeLines(" ",con=TxtCon)
+      writeLines(" ",con=TxtCon)
+      
+      writeLines("Obs/Exp Ratio Categories:",con=TxtCon)
+      xx <- capture.output(print(GisTableCat,row.names=FALSE,digits=8,right=FALSE))
+      writeLines(xx ,con=TxtCon)
+      #writeLines(" ",con=TxtCon)
+      writeLines(" ",con=TxtCon)
+      
+      writeLines(" ",con=TxtCon)
+      
+      # If call  TextRepClus(TxtCon, categ, ClusLocMap, ClusClusMap, ClusClusLab, GisTableCat)  
+      
+      #  Build US header variables
+      USRes              <- NULL
+      USRes$TStates      <- us99.index$states
+      #USRes$THsas        <- us99.index$hsas
+      USRes$TCounty      <- us99.index$county
+      USRes$TTracts      <- us99.index$tracts
+      # format
+      USRes$LTStates     <- sprintf("%8i",USRes$TStates)
+      #USRes$LTHsas       <- sprintf("%8i",USRes$THsas)
+      USRes$LTCounty     <- sprintf("%8i",USRes$TCounty)
+      USRes$LTTracts     <- sprintf("%8i",USRes$TTracts)
+      
+      #cat("USRes - typeof:",typeof(USRes),"  class:",class(USRes)," Z-4983 \n")
+      
+      ####
+      #
+      #   Loop through clusters and report statistics on Cluster Info, Location Info
+      #
+      ####
+      #cat("Loop through cluster and build report stats Z-4990 .\n")
+      
+      ESet       <- EllipseSetBase
+      ESet_L     <- dim(ESet)[1]
+      
+      if (EUpValue) {
+      
+         writeLines(paste0("Number of clusters found with P_VALUE < 0.05 = ",ESet_L)) 
+         writeLines("Only clusters are reported when location (gis) records are available for the cluster.")
+         writeLines(" ") 
+      } else {
+         writeLines("The Cluster Results P_VALUE data is missing. All cluster mapped.")
+         writeLines(paste0("Number of clusters mapped = ",ESet_L)) 
+         writeLines(" ") 
+      }
+      ####
+      #
+      #  Changes in St/Co, St/Co/Place, and Location reports.
+      #
+      #  To support the tiered report, all St/Co, St/Co/Place and Location data frames for 
+      #  each cluster are collected and saved for one cycle.
+      #
+      #  As each tier level is requested and generated, the matching rows in the data frames
+      #  will be pulled out and printed.
+      #
+      #  If the older reports are also requested, then the 
+      #  report will generated using the same data.frames for the cluster.
+      
+      ####
+      
+      ####
+      #
+      #  Loop through the cluster data, print it and pull the location information
+      #  again and print it.
+      #
+      ####
+      
+      TotalHdrUS        <- "  US --     TotSts  TotCnty  TotTrts"
+      writeLines(TotalHdrUS,con=TxtCon)
+      USRes$Lead   <- "         "
+      #str(USRes)
+      
+      cat(unlist(USRes[c("Lead","LTStates","LTCounty","LTTracts")]),"\n",sep=" ",file=TxtCon)
+      writeLines(" ",con=TxtCon)
+      
+      #
+      #  Essentually - EllipseSetBase is the main list of Clusters and Years.
+      #
+      
+      if ( ESet_L > 0 ) {
+         # have clusters..
          
-         ####
-         #
-         #  Get and set up detail record - based on level
-         #
-         ####
-         
-         #cat("Get GisLocList Z-5118 - colnames:",colnames(GisList),"\n")
-         
-         #
-         #  Modify if NORMAL supported.
-         #
-         
-         # Get the list of locations belonging to this cluster ONLY  (GisLocList)
-         # Reorder detail list.
-         
-         GisLocList <- GisList[GLGOrder,c("LOC_ID","CLUSTER","LOC_OBS","LOC_EXP","LOC_ODE","LOC_RR","LocCat")]
-         lenGisLoc  <- length(GLGOrder)
-         
-         #cat("GisLocList - len:",lenGisLoc,"  typeof:",typeof(GisLocList),"  class:",class(GisLocList),"\n")
-                  
-         if (lenGisLoc > 0) { # there are locations in the cluster.
-            #cat("Text:Gathering location records:",GisLocList$LOC_ID,"\n")
+         for (ind in c(1:ESet_L))  {
             
-            GisLocList$LOC_ID <- as.character(GisLocList$LOC_ID)
-            #  Bug - ID was used as factor not character.
-              
-            names(GisLocList) <- c("LOC_ID","Cluster","Observed","Expected","Obs_Exp","RelRisk","Category")
+            # loop through cluster one by one.
+            # pull together - Cluster Data
+            #cat("Text : Cluster Number : ",ind,"\n")
             
-            # based on type of data - LocIDType = 2, 5, 11 (State, St/Co, St/Co/Tr)
+            # Pull off one cluster record (into three sub-records for printing.)
             
-            if (LocIDType == 2) {
-               leadBlk            <- "    "
-               #  add additional fields for State Location for aggregation
-               
-               GisLocList$stID    <- GisLocList$LOC_ID
-               GisLocList$State   <- st99.index[GisLocList$stID,"stName"]
-               #GisLocList$HsaID   <- ""
-               #  Key # 1 - stcoID   ->  State/County code
-               GisLocList$stcoID  <- ""
-               GisLocList$County  <- ""
-               GisLocList$plKey   <- ""
-               GisLocList$Place   <- ""
-               
-               #  Counts
-               GisLocList$TState   <- 1
-               GisLocList$StateIn  <- 1
-               #GisLocList$THsas    <- st99.index(GisLocList$stID,"hsas"]
-               #GisLocList$THsasIn  <- st99.index(GisLocList$stID,"hsas"]
-               GisLocList$TCounty  <- st99.index[GisLocList$stID,"county"]
-               GisLocList$CountyIn <- st99.index[GisLocList$stID,"county"]
-               GisLocList$TTracts  <- st99.index[GisLocList$stID,"tracts"]
-               GisLocList$TractsIn <- st99.index[GisLocList$stID,"tracts"]
+            ESWork1          <- NULL
+            ESWork1          <- ESet[ind,c("StrDate","EndDate","NUMBER_LOC","LLR","P_VALUE","NYr","HL")]
+            
+            ESWork2          <- NULL
+            ESWork2          <- ESet[ind,c("OBSERVED","EXPECTED","ODE","REL_RISK","Cat")]
+       
+            ESWork3          <- NULL
+            if (CoordinatesType == 0) {
+               ESWork3          <- ESet[ind,c("LOC_ID","E_MAJOR","E_MINOR","E_ANGLE","X","Y","t_X","t_Y")]
+            } else {
+               ESWork3          <- ESet[ind,c("LOC_ID","E_MAJOR","E_MINOR","E_ANGLE","LATITUDE","LONGITUDE","t_X","t_Y")]
             }
-            
-            #if (LocIDType == 3) {   # State/HSAs
-            #   leadBlk            <- "        "
-            #   #  add additional fields for State/Hsas Location
-            #   GisLocList$HsaID   <- str_trim(GisLocList$LOC_ID)
-            #   GisLocList$stID    <- hs99.index[GisLocList$LOC_ID,"stID"] # go to HSA table and look up state.
-            #   GisLocList$State   <- st99.index[GisLocList$stID,"stName"]
-            #   GisLocList$stcoID  <- ""
-            #   GisLocList$County  <- ""
-            #   GisLocList$plKey   <- ""
-            #   GisLocList$Place   <- ""
-            #   
-            #   # Counts
-            #   GisLocList$TState   <- 0
-	    #   GisLocList$StateIn  <- 0
-	    #   GisLocList$THsas    <- 1
-	    #   GisLocList$HsasIn   <- 1
-	    #   GisLocList$TCounty  <- hs99.index[GisLocList$HsaID,"county"]
-	    #   GisLocList$CountyIn <- hs99.index[GisLocList$HsaID,"county"]
-	    #   GisLocList$TTracts  <- hs99.index[GisLocList$HsaID,"tracts"]
-	    #   GisLocList$TractsIn <- hs99.index[GisLocList$HsaID,"tracts"]
-            #   
-            #}
-            
-            if (LocIDType == 5) {
-               leadBlk            <- "        "
-               #  add additional fields for State/County Location
-               GisLocList$stID    <- str_sub(GisLocList$LOC_ID,1,2)
-               GisLocList$State   <- st99.index[GisLocList$stID,"stName"]
-               #  Key # 1 - stcoID   ->  State/County code
-               GisLocList$stcoID  <- GisLocList$LOC_ID  # 5 digit fip code for state county
-               GisLocList$County  <- co99.index[GisLocList$stcoID,"coName"]
-               #GisLocList$HsaID   <- co99.index(GisLocList$stcoID,"HsaID"]
-               GisLocList$plKey   <- ""
-               GisLocList$Place   <- ""
-               
-               #  Counts
-               GisLocList$TState   <- 0
-               GisLocList$StateIn  <- 0
-               #GisLocList$THsas    <- 0
-               #GisLocList$HsasIn   <- 0
-               GisLocList$TCounty  <- 1
-               GisLocList$CountyIn <- 1
-               GisLocList$TTracts  <- co99.index[GisLocList$stcoID,"tracts"]
-               GisLocList$TractsIn <- co99.index[GisLocList$stcoID,"tracts"]
-            
-            }
-            
-            if (LocIDType == 11) {
-               leadBlk            <- "            "
-               #  add additional fields for State/County/Tract location
-               GisLocList$stID    <- str_sub(GisLocList$LOC_ID,1,2)
-               GisLocList$State   <- st99.index[GisLocList$stID,"stName"]
-               #  Key # 1 - stcoID   ->  State/County code
-               GisLocList$stcoID  <- substr(GisLocList$LOC_ID,1,5)  # 5 digit fip code for state county
-               GisLocList$County  <- co99.index[GisLocList$stcoID,"coName"]
-               #GisLocList$HsaID   <- co99.index(GisLocList$stcoID,"HsaID"]
-              
-               GisLocList$plKey   <- tr99.index[GisLocList$LOC_ID,"plKey"]
-               GisLocList$Place   <- str_sub(GisLocList$plKey,6)
-  
-               #  Counts
-               GisLocList$TState   <- 0
-               GisLocList$StateIn  <- 0
-               #GisLocList$THsas    <- 0
-               #GisLocList$HsasIn   <- 0
-               GisLocList$TCounty  <- 0
-               GisLocList$CountyIn <- 0
-               GisLocList$TTracts  <- 1
-               GisLocList$TractsIn <- 1
-            
-            }
-            
-            #
-            #  Design:
-            #     US summary record
-            #       Cluster summary record (CLUS)
-            #          State Detailed (LOC)
-            #
-            #     US summary record
-            #       Cluster summary record (CLUS)
-            #          State Accum 
-            #             County Detailed (LOC)
-            #
-            #  Alternate # 1
-            #
-            #     US summary record
-            #       Cluster summary record (CLUS)
-            #          State Accum 
-            #             County Detailed (LOC)
-            #
-            #     US summary record
-            #       Cluster summary record (CLUS)
-            #          State Accum
-            #             County Accum
-            #                Place Accum
-            #                   Tract Detailed (LOC)
-            #
-            #  Alternate # 2
-            #
-            #     US summary record
-            #       Cluster summary record (CLUS)
-            #          State Accum 
-            #             Hsa Accum 
-            #                County Detailed (LOC)
-            #
-            #     US summary record
-            #       Cluster summary record (CLUS)
-            #          State Accum
-            #             Hsa Accum 
-            #                County Accum
-            #                   Place Accum
-            #                      Tract Detailed (LOC)
-            #
-            #
-            #
-            #  Now we have the literal names.  We can calculate the widths of each element.
-            #
-          
-            #  Get maximum width of each field - State, County, Place names
-            MaxState      <- max(sapply(GisLocList$State,    function(x) nchar(as.character(x))))
-            #MaxHsa        <- max(sapply(GisLocList$Hsa,      function(x) nchar(as.character(x))))
-            MaxCounty     <- max(sapply(GisLocList$County,   function(x) nchar(as.character(x))))
-            MaxPlace      <- max(sapply(GisLocList$Place,    function(x) nchar(as.character(x))))
-            MaxCategory   <- max(sapply(GisLocList$Category, function(x) nchar(as.character(x)))) + 2  
-            if (MaxCategory <= 14)  MaxCategory = 14   # minimum category width
-              
-            MaxColumn     <- 11 + 12 + 2   # standard column max.
-            if (MaxColumn < (MaxState + 2))  MaxColumn <- MaxState + 2
-            #if (MaxColumn < (MaxHsa + 2))    MaxColumn <- MaxHsa + 2
-            if (MaxColumn < (MaxCounty + 5)) MaxColumn <- MaxCounty + 5
-            if (MaxColumn < (MaxPlace + 10)) MaxColumn <- MaxPlace + 10
-              
-            # ssscccppplll = 12 characters
-            # Longest  State + 2, Hsa + 2, County + 3, Place + 6, Location + 12 (11+12)  - all plus 2
-            # 
-            
-            #
-            #  Now finish creating any fields that are based on column width.
-            #
-            #  Create format strings using max string widths.  (space from left padding sections)
-            
-            SCPFormat       <- paste0("%-",MaxState,"s %-",MaxCounty,"s %-",MaxPlace,"s")    # State/County/Place
-            SCFormat        <- paste0("%-",MaxState,"s %-",MaxCounty,"s")                    # State/County
-            SFormat         <- paste0("%-",MaxState,"s")                                     # State
-
-            #  Additional Fields based on column sizes.
-            
-            GisLocList$RIName        <- str_pad(GisLocList$LOC_ID,MaxColumn,"right")
-            # FIPS code.
-            GisLocList$FICol         <- str_pad(paste0("         ",GisLocList$LOC_ID),MaxColumn,"right")
-            
+            # pull together - Location Data for Cluster
+            ClusNum          <- ColTable$CLUSTER[ind]
              
-            if (idMode == 1) {
-               # setup State labels
-               GisLocList$Trailer <- sprintf(SFormat,GisLocList$State) 
-               GisLocList$Name    <- str_pad(paste0("  ",GisLocList$State),MaxColumn,"right")
-            }
-            if (idMode == 2) {
-               # setup State/County labels
-	       GisLocList$Trailer <- sprintf(SCFormat,GisLocList$State,GisLocList$County) 
-	       GisLocList$Name    <- str_pad(paste0("      ",GisLocList$County),MaxColumn,"right")
-            }
-            if (idMode == 3) {
-               # setup State/County/Place/Tract labels
-	       GisLocList$Trailer <- sprintf(SCPFormat,GisLocList$State,GisLocList$County,GisLocList$Place) 
-	       GisLocList$PName   <- str_pad(paste0("          ",GisLocList$Place),MaxColumn,"right")
-               GisLocList$Name    <- str_pad(paste0("                ",GisLocList$LOC_ID),MaxColumn,"right")
-            }
-    
-            #print(str(GisLocList))
-            
-            #
-            #  State Detailed
-            #  Hsa Detailed
-            #  County Detailed
-            #  Tract Detailed
-            #
-            #  US Accum
-            #  State Accum
-            #  County Accum
-            #
-            #  US Name
-            #  State Name
-            #  State/County Name
-            #  State/County/Place Name
-            #
-            
-            # Numbers sections:
-            #    State Accum
-            #    Hsa Accum
-            #    County Accum
-            #    Place Accum
-            
-            #    Titles
-            
-            #
-            #  Update to include HSA counts - may need to have as option.
-            #
-            
-            #   Basic Pattern for ODE, States, Counties, Tracts
-            TObsExpODE        <- "  Observed  Expected  Obs/Exp"
-            #                     12345678901234567890123456789
-            #                         10        10        9
-            
-            TotalHdrUS        <- "   TotStates  TotCounty  TotTracts"
-            
-            TAccSt            <- "    TotSts  InClsSts PerStInCls"
-            TAccCo            <- "   TotCnty InClsCnty PerCoInCls"
-            TAccTr            <- "   TotTrts InClsTrts  PerTInCls"
-            #                     1234567890123456789012345678901
-            #                         10        10       11
+             # Format numerical values - numeric -> character
+            ESWork1$LLR      <- sprintf("%.3f",ESWork1$LLR)
+            ESWork1$P_VALUE  <- sprintf("%.6f",ESWork1$P_VALUE)
            
-            TTotSt            <- "   TotCnty   TotTrts"   # for state detail record
-            #                     12345678901234567890
-            #                         10        10
+            ESWork2$EXPECTED <- sprintf("%.3f",ESWork2$EXPECTED)
+            ESWork2$ODE      <- sprintf("%.3f",ESWork2$ODE)
+            ESWork2$REL_RISK <- sprintf("%.3f",ESWork2$REL_RISK)
             
-            catStr            <- str_pad("Category",MaxCategory,"left")
+      
+            # Get list of locations for this cluster area
+            GisList          <- GisTable[GisTable$CLUSTER == ClusNum,]  
+            
+            #cat("GisList colnames:",colnames(GisList)," Z-5077 \n")
+      
+            GLGOrder         <- seq(1:length(GisList$Cluster))  # no sort order.
            
-            DetailExtHdr      <- paste0("   RelRisk ",catStr,"  St/Co/Place")
-            DetailExtHdr2     <- paste0("   RelRisk ",catStr)
-            #                            1234567890
-            #                                10
+            # set HIGH or LOW indicator for Cluster in GisList (convert from numeric to characters)
+            if (ESWork1$HL < 0) {
+               # Indicate Cluster is a LOW cluster and order locations Low to High
+               ESWork1$HL    <- as.character("LOW ")
+               GLGOrder      <- order(GisList$LocCat,decreasing=T) 
+            } else {
+               if (ESWork1$HL > 0) {
+                  # Indicate Cluster is a HIGH cluster and order locations High to Low.
+                  ESWork1$HL <- as.character("HIGH")
+                  GLGOrder   <- order(GisList$LocCat,decreasing=F)
+               }
+            } 
             
+            #cat("GLGOrder:",GLGOrder,"\n")
+             
+            ####
             #
-            # US Summary header for cluster
+            # Start text report for this cluster
             #
-            AccumHdrUSAll     <- paste0(TObsExpODE,TAccSt,TAccCo,TAccTr)
-
+            ####
+             
+            #  Cluster Statistics.
+            #cat("Text : Cluster Statistics.\n")
+             
+            writeLines(paste("CLUSTER # ",ClusNum," Details:",sep=""),con=TxtCon)
+            writeLines("",con=TxtCon)
+          
+            names(ESWork1) <- c("Start Date","End Date","Number of Locs","LLR","P_Value","Num_Years","High/Low")         
+            names(ESWork2) <- c("Observed","Expected","Obs/Exp","Relative Risk","Category")         
+            names(ESWork3) <- c("Centroid_ID","E_Major","E_Minor","E_Angle","Org_X","Org_Y","Tran_X","Tran_Y")         
+         
+            #xx <- capture.output(ESWork1)
+            xx <- paste("        ",capture.output(print(ESWork1,row.names=FALSE)),sep="")
+            writeLines(xx,con=TxtCon)
+           
+            #xx <- paste("       ",capture.output(ESWork2),sep="")
+            xx <- paste("            ",capture.output(print(ESWork2,row.names=FALSE)),sep="")
+            writeLines(xx,con=TxtCon)
+           
+            #xx <- paste("       ",capture.output(ESWork3),sep="")
+            xx <- paste("            ",capture.output(print(ESWork3,row.names=FALSE)),sep="")
+            writeLines(xx,con=TxtCon)
+           
+           
+            #  Catagorize locations based on Obs_Exp ratio value
             #
-            # for State Data
+            #  End of cluster header and data
             #
-            # TotalHdrUS
-            AccumHdrUS        <- paste0(TObsExpODE,TAccSt,TAccCo,TAccTr)        # collection of states in cluster
-            DetailHdrSt       <- paste0(TObsExpODE,TTotSt,DetailExtHdr2)  # represents one state
-            
-            # for County Data
-            AccumHdrUS        <- paste0(TObsExpODE,TAccSt,TAccCo,TAccTr)        # collection of states in cluster
-            AccumHdrSt        <- paste0(TObsExpODE,TAccCo,TAccTr) 
-            DetailHdrCo       <- paste0(TObsExpODE,TAccTr,DetailExtHdr2)  # represents one county
-            
-            # for Tract Data
-            AccumHdrUS        <- paste0(TObsExpODE,TAccSt,TAccCo,TAccTr)        # collection of states in cluster
-            AccumHdrSt        <- paste0(TObsExpODE,TAccCo,TAccTr) 
-            AccumHdrCo        <- paste0(TObsExpODE,TAccTr)            
-            AccumHdrPl        <- paste0(TObsExpODE,TAccTr)                # represents one place 
-            DetailHdrTr       <- paste0(TObsExpODE,DetailExtHdr2)
-            
-            xBasicHeaderL      <- "   Observed   Expected    Obs/Exp  TotTracts  InClsTrts  PerInClus"
-            xBasicHeaderS      <- "   Observed   Expected    Obs/Exp"
+            #####
+      
+            #####
+            #
+            #  Now gather the data.frames for the location, state/county, and state/county/place census tract
+            #   reports.
+            #
+            #####
                       
             ####
-            # 
-            #    DETAILED RECORD numbers (same for each level).
+            #
+            #  Get Location rows related to cluster
+            #
+            #  Add state, county, place names information from tr99.index (wk99)
+            #    possible layouts:  state only,  state & county only,  state county place tract.
+            #    written for s c t only, add extra set ups.
             #
             ####
-              
-            #cat(" Z-4998 - GisLocList:\n")
-            #print(str(GisLocList))
-            # format literals - detail records should not change.
             
-            # Calculate needed values and format  (All levels)
-            GisLocList$LObserved    <- sprintf("%10i",GisLocList$Observed) 
-            GisLocList$LExpected    <- sprintf("%10.3f",GisLocList$Expected)
-            GisLocList[,"LObs_Exp"] <- sprintf("%9.3f",GisLocList[,"Obs_Exp"])
-            
-            GisLocList$LRelRisk     <- sprintf("%10.2f",GisLocList$RelRisk)
-            GisLocList$LCategory    <- str_pad(as.character(GisLocList$Category),MaxCategory,"left")
-            
-            # Used at State Level
-            
-            GisLocList$LTCounty     <- sprintf("%10i", GisLocList$TCounty)
-            GisLocList$LCountyIn    <- sprintf("%10i", GisLocList$CountyIn)
-            xTF                     <- GisLocList$TCounty == 0
-            #cat("check for zero T County:",sum(xTF),"\n")
-            if (any(xTF)) {
-               GisLocList[xTF,"TCounty"]  <- NA
-               GisLocList[xTF,"CountyIn"] <- NA
-            }
-            GisLocList$PCCoIn       <- GisLocList$CountyIn/GisLocList$TCounty * 100
-            GisLocList$LPCCoIn      <- sprintf("%10.2f%%", GisLocList$PCCoIn)
-            
-            # Used at State, County and Place Levels
-            GisLocList$LTTracts     <- sprintf("%10i", GisLocList$TTracts)
-            GisLocList$LTractsIn    <- sprintf("%10i", GisLocList$TractsIn)
-            xTF                     <- GisLocList$TTracts == 0
-            #cat("check for zero T tracts:",sum(xTF),"\n")
-            if (any(xTF)) {
-               GisLocList[xTF,"TTracts"]  <- NA
-               GisLocList[xTF,"TractsIn"] <- NA
-            }
-            GisLocList$PCTrIn       <- GisLocList$TractsIn/GisLocList$TTracts * 100
-            GisLocList$LPCTrIn      <- sprintf("%10.2f%%", GisLocList$PCTrIn)
-  	    
-            #GisLocHeader            <- paste0("   Census Tract  ",DetailHdrTr,DetailExtHdr)
-            #GisLocHeaderT           <- paste0(str_pad("        Census Tract",MaxColumn,"right"),DetailHdrTr,DetailExtHdr2)
-        
-            #cat("GisLocList - after Z-4906:\n")
-            #print(str(GisLocList))
             ####
             #
-            #  Build report based on level of data
+            #  Get and set up detail record - based on level
             #
             ####
-            #cat("idMode:",idMode,"\n")
             
-            if (idMode == 1)  {
+            #cat("Get GisLocList Z-5154 - colnames:",colnames(GisList),"\n")
             
-               #  Design:
-               #      Cluster
-               #         US Level - Cluster Summary
-               #            State Detail
-               #
-               ##  US level - Cluster Summary
-               #USRes$Lead       <- "                   "
-               #
-               #USRes$StatesIn   <- length(unique(GisLocList$stID))
-               #USRes$LStatesIn  <- sprintf("%10i",USRes$StatesIn)
-               #USRes$PCStIn     <- USRes$StatesIn/USRes$TStates * 100
-               #USRes$LPCStIn    <- sprintf("%10.2f%%",USRes$PCStIn)
-               #
-               #USRes$CountyIn   <- sum(GisLocList$NCounty)
-               #USRes$LCountyIn  <- sprintf("%10i",USRes$CountyIn)
-               #USRes$PCCoIn     <- USRes$CountyIn/USRes$TCounty * 100
-               #USRes$LPCCoIn    <- sprintf("%10.2f%%",USRes$PCCoIn)
-               #
-               #USRes$TractsIn   <- sum(GisLocList$NTracts)
-               #USRes$LTractsIn  <- sprintf("%10i",USRes$TractsIn)
-               #USRes$PCTrIn     <- USRes$TractsIn/USRes$TTracts * 100
-               #USRes$LPCTrIn    <- sprintf("%10.2f%%",USRes$PCTrIn)
-               #
-               #USRes$Observed   <- sum(GisLocList$Observed)
-               #USRes$Expected   <- sum(GisLocList$Expected)
-               #USRes$ODE        <- USRes$Observed/USRes$Expected
-               #USRes$LObserved  <- sprintf("%10i",USRes$Observed)
-               #USRes$LExpected  <- sprintf("%10.3f",USRes$Expected)
-               #USRes$LODE       <- sprintf("%9.3f",USRes$ODE)
-               #
-               #writeLines(paste0(" US Cluster Summary:",AccumHdrUS),con=TxtCon)   
-               #cat(unlist(USRes[c("Lead","LObserved","LExpected","LODE",
-               #                      "LTStates","LStatesIn","LPCStIn",
-               #                      "LTCounty","LCountyIn","LPCCoIn",
-               #                      "LTTracts","LTractsIn","LPCTrIn")]),"\n",sep=" ",file=TxtCon)
+            #
+            #  Modify if NORMAL supported.
+            #
             
-               #
-               #  State Detail
-               #
-               # order list in decending ODE order.
-               
-               GisLOrd <- order(GisLocList[,"Obs_Exp"],decreasing=TRUE)
-               
-               #  State Header
-               writeLines(" ",con=TxtCon)
-               writeLines(paste0(str_pad("  State",MaxColumn,"right"),DetailHdrSt),con=TxtCon)
-               
-               lenStList  <- dim(GisLocList)[1]
-               #cat("length of state list:",lenStList,"\n")
-               
-               #  State Detail Records
-               for (inSt in c(1:lenStList)) {
-                  
-                  inSSt   <- GisLOrd[inSt]
-                  wStr    <- unlist(GisLocList[inSSt,c("Name","LObserved","LExpected","LObs_Exp",
-                                   "LCountyIn","LTractsIn","LRelRisk","LCategory")],
-                                   use.names=FALSE)
-                  cat(wStr,"\n",sep="",append=TRUE, file=TxtCon)
-      
-               }
-               writeLines(" ",con=TxtCon)
-            }  # end of idMode = 1
+            # Get the list of locations belonging to this cluster ONLY  (GisLocList)
+            # Reorder detail list.
             
-            if (idMode == 2 ) {
-               #  State/County data
-               #
-               #  Design:
-               #     Cluster 
-               #        US cluster Summary (sum)
-               #           State Summary (agg)
-               #              County Detail...
-               #           State Summary (agg)
-               #              County Detail...
-               #
-               #  US level - Cluster Summary
-               #USRes$Lead       <- "                   "
-               #
-               #USRes$StatesIn   <- length(unique(GisLocList$stID))
-               #USRes$LStatesIn  <- sprintf("%10i",USRes$StatesIn)
-               #USRes$PCStIn     <- USRes$StatesIn/USRes$TStates * 100
-               #USRes$LPCStIn    <- sprintf("%10.2f%%",USRes$PCStIn)
-               #
-               #USRes$CountyIn   <- sum(GisLocList$CountyIn)
-               #USRes$LCountyIn  <- sprintf("%10i",USRes$CountyIn)
-               #USRes$PCCoIn     <- USRes$CountyIn/USRes$TCounty * 100
-               #USRes$LPCCoIn    <- sprintf("%10.2f%%",USRes$PCCoIn)
-               #
-               #USRes$TractsIn   <- sum(GisLocList$TractsIn)
-               #USRes$LTractsIn  <- sprintf("%10i",USRes$TractsIn)
-               #USRes$PCTrIn     <- USRes$TractsIn/USRes$TTracts * 100
-               #USRes$LPCTrIn    <- sprintf("%10.2f%%",USRes$PCTrIn)
-               #
-               #USRes$Observed   <- sum(GisLocList$Observed)
-               #USRes$Expected   <- sum(GisLocList$Expected)
-               #USRes$ODE        <- USRes$Observed/USRes$Expected
-               #USRes$LObserved  <- sprintf("%11i",USRes$Observed)
-               #USRes$LExpected  <- sprintf("%10.3f",USRes$Expected)
-               #USRes$LODE       <- sprintf("%9.3f",USRes$ODE)
-               #
-               #writeLines(paste0(" US Cluster Summary:",AccumHdrUS),con=TxtCon)   
-               #cat(unlist(USRes[c("Lead","LObserved","LExpected","LODE",
-               #                      "LTStates","LStatesIn","LPCStIn",
-               #                      "LTCounty","LCountyIn","LPCCoIn",
-               #                      "LTTracts","LTractsIn","LPCTrIn")]),"\n",sep=" ",file=TxtCon)
+            GisLocList <- GisList[GLGOrder,c("LOC_ID","CLUSTER","LOC_OBS","LOC_EXP","LOC_ODE","LOC_RR","LocCat")]
+            lenGisLoc  <- length(GLGOrder)
             
-               ####
-               #
-               #  States - step through list
-               #
-               ####
-               #
-               # State List - and aggregate needed fields
-               #   State Accum
-               #
-               ####
-           
-               stxx1 <- aggregate(Observed ~ State + stID, data=GisLocList, FUN=length)   # get number of counties
-               stxx2 <- aggregate(cbind(Observed, Expected, CountyIn, TractsIn) ~ State + stID , data=GisLocList, FUN=sum)  # get sum of Obs and Exp
-                 
-               # the assumption is the rows in xx1 and xx2 are in the same order and match - one to one after
-               #  the two aggregations.
-               
-               #  State Level Summary 
-               ResSt           <- NULL
-               #cat("dim(stxx1):",dim(stxx1),"\n")
-               ResSt           <- stxx1                  # by state - number of counties involved
-               
-               colnames(ResSt) <- c("State","stID","CountyIn")
-               ResSt$stID      <- as.character(ResSt$stID)
-               ResSt$State     <- as.character(st99.index[ResSt$stID,"stName"])
-               
-               ResSt$Name      <- str_pad(paste0("  ",ResSt$State),MaxColumn,"right")
-               #ResSt$FCol      <- str_pad(ResSt$State,MaxColumn,"right")
-          
-               ResSt$Observed  <- stxx2$Observed
-               ResSt$LObserved <- sprintf("%10.3f",ResSt$Observed)
-               ResSt$Expected  <- stxx2$Expected
-               ResSt$LExpected <- sprintf("%10.3f",ResSt$Expected)
-               ResSt$Obs_Exp   <- ResSt$Observed / ResSt$Expected
-               ResSt[is.nan(ResSt$Obs_Exp),"Obs_Exp"] = 0
-               ResSt$LObs_Exp  <- sprintf("%9.3f",ResSt$Obs_Exp)
-                
-               ResSt$TCounty   <- st99.index[ResSt$stID,"county"]
-               ResSt$LTCounty  <- sprintf("%10i",ResSt$TCounty)
-               ResSt$CountyIn  <- stxx2$CountyIn
-               ResSt$LCountyIn <- sprintf("%10i",ResSt$CountyIn)
-               
-               ResSt$PCCoIn    <- ResSt$CountyIn/ResSt$TCounty * 100
-               ResSt$LPCCoIn   <- sprintf("%10.2f%%",ResSt$PCCoIn)
-               
-               ResSt$TTracts   <- st99.index[ResSt$stID,"tracts"]
-               ResSt$LTTracts  <- sprintf("%10i",ResSt$TTracts)
-               ResSt$TractsIn  <- stxx2$TractsIn
-               ResSt$LTractsIn <- sprintf("%10i",ResSt$TractsIn)
-               ResSt$PCTrIn    <- ResSt$TractsIn/ResSt$TTracts * 100
-               ResSt$LPCTrIn   <- sprintf("%10.2f%%",ResSt$PCTrIn)
-             
-               #  State Header with County Detail
-               
-               ResSOrd <- order(ResSt$Obs_Exp,decreasing=TRUE)
-               
-               lenStList   <- length(ResSOrd)  # get number of states from aggregate
-               #cat("Length of state Aggreg List:",lenStList,"\n")
-               
-               for (inSt in seq_len(lenStList)) {
-              
-                  #  state title header
-                  writeLines(" ",con=TxtCon)
-                  writeLines(paste0(str_pad("State",MaxColumn,"right"),AccumHdrSt),con=TxtCon)
-              
-                  inSSt  <- ResSOrd[inSt]      # get order of states within cluster
-                  
-                  # State Summary Aggregate 
-                  wStr <- unlist(ResSt[inSSt,c("Name","LObserved","LExpected","LObs_Exp",
-                                "LTCounty","LCountyIn","LPCCoIn",
-                                "LTTracts","LTractsIn","LPCTrIn")],use.names=FALSE)
-                               
-                  cat(wStr,"\n",sep="",append=TRUE, file=TxtCon)
-                  
-                  #
-                  #  Now do the detail county records for this state entry.
-                  #
-                  
-                  # Written State Summary - now for the county detail
-	          
-                  CurStID          <- ResSt[inSSt,"stID"]
-                  
-                  # get part of list for one states counties.
-                  CoLocList        <- GisLocList[GisLocList$stID == CurStID,]
-                  
-                  # get sorted order (high ODE to low)
-                  CoLocOrd         <- order(CoLocList[,"Obs_Exp"],decreasing=TRUE)
-                  
-                  # nubmer of counties for this state within cluster 
-                  lenCoList        <- dim(CoLocList)[1]
-                  #cat("Length of County details list:",lenCoList,"\n")
-                  
-                  # County Details Header
-                  writeLines(" ",con=TxtCon)
-                  writeLines(paste0(str_pad("    County",MaxColumn,"right"),DetailHdrCo),con=TxtCon)
-   
-                  # County detail records
-                  for (inCo in c(1:lenCoList)) {
-
-                     inSCo    <- CoLocOrd[inCo]
-                     cat(unlist(CoLocList[inSCo,c("Name","LObserved","LExpected","LObs_Exp",
-                                           "LTTracts","LTractsIn","LPCTrIn",
-                                           "LRelRisk","LCategory")]),"\n",
-                                           sep="",file=TxtCon,append=TRUE)
-                   
-                  }  # end of county loop within state within cluster
-                  
-              } # end of state loop within cluster
-           } # end of county cluster
-           
-           if (idMode == 3) {
-              # Census tract.
-              
-              #  Design:
-              #    US Statistics
-              #       Cluster
-              #          US Summary
-              #             State Summary
-              #                County Summary
-              #                   Place Summary
-              #                      Trace Detail
-              #     ...
-              #
-              
-              #  US level - Cluster Summary
-              #USRes$Lead       <- "                   "
-              #
-              #USRes$StatesIn   <- length(unique(GisLocList$stID))
-              #USRes$LStatesIn  <- sprintf("%10i",USRes$StatesIn)
-              #USRes$PCStIn     <- USRes$StatesIn/USRes$TStates * 100
-              #USRes$LPCStIn    <- sprintf("%10.2f%%",USRes$PCStIn)
-              #
-              #USRes$CountyIn   <- sum(GisLocList$NCounty)
-              #USRes$LCountyIn  <- sprintf("%10i",USRes$CountyIn)
-              #USRes$PCCoIn     <- USRes$CountyIn/USRes$TCounty * 100
-              #USRes$LPCCoIn    <- sprintf("%11.2f%%",USRes$PCCoIn)
-              #
-              #USRes$TractsIn   <- sum(GisLocList$NTracts)
-              #USRes$LTractsIn  <- sprintf("%10i",USRes$TractsIn)
-              #USRes$PCTrIn     <- USRes$TractsIn/USRes$TTracts * 100
-              #USRes$LPCTrIn    <- sprintf("%10.2f%%",USRes$PCTrIn)
-              #
-              #USRes$Observed   <- sum(GisLocList$Observed)
-              #USRes$Expected   <- sum(GisLocList$Expected)
-              #USRes$ODE        <- USRes$Observed/USRes$Expected
-              #USRes$LObserved  <- sprintf("%10i",USRes$Observed)
-              #USRes$LExpected  <- sprintf("%10.3f",USRes$Expected)
-              #USRes$LODE       <- sprintf("%9.3f",USRes$ODE)
-              #
-              ##writeLines(paste0(" US Cluster Summary:",AccumHdrUS),con=TxtCon)   
-              ##cat(unlist(USRes[c("Lead","LObserved","LExpected","LODE",
-              ##                      "LTStates","LStatesIn","LPCStIn",
-              ##                      "LTCounty","LCountyIn","LPCCoIn",
-              ##                      "LTTracts","LTractsIn","LPCTrIn")]),"\n",sep=" ",file=TxtCon)
-            
-              ####
-              #
-              #  States - step through list of tracts...
-              #
-              ####
-              #cat("GisLocList for cluster:\n")
-              #print(GisLocList)
-              
-              #
-              #  Tract to Place.  Aggregate all tracts to places for state.
-              #
-              #cat("Tract GisLocList to Place records\n")
-	      plxx2 <- aggregate(cbind(Observed, Expected,  TractsIn) ~ State + stID + County + plKey + Place, data=GisLocList, FUN=sum)  # get sum of Obs and Exp
-	      
-	      #cat("plxx2 - aggregate SUM.\n")
-	      #print(plxx2)
-	      #print(str(plxx2))
-	      #
-	      #cat("Build Place table for tracts\n")
-	      
-	      #  State/County/Place Level Summary - Aggregate place to county.
-	      
-	      ResSCP           <- plxx2                  # number of tracts aggre up to Place.
-	      colnames(ResSCP) <- c("State","stID","County","plKey","Place","Observed","Expected","TractsIn")
-	      #ResSCP$stID     <- as.character(ResSCP$stID)
-	      #ResSCP$State    <- as.character(st99.index[ResSCP$stID,"stName"])
-	      ResSCP$stcoID    <- str_sub(ResSCP$plKey,1,5)
-	      ResSCP$Name      <- str_pad(paste0("            ",ResSCP$Place),MaxColumn,"right")
-	      #ResSCP$FCol     <- str_pad(ResSCP$Place,MaxColumn,"right")
-	      
-	      # sum tract Obs, Exp and ODE values within place.
-	      #ResSCP$Observed  <- plxx2$Observed                      # sum tract values
-
-	      ResSCP$LObserved <- sprintf("%10.3f",ResSCP$Observed)
-	      #ResSCP$Expected  <- plxx2$Expected
-	      ResSCP$LExpected <- sprintf("%10.3f",ResSCP$Expected)
-	      ResSCP$Obs_Exp   <- ResSCP$Observed / ResSCP$Expected
-	      ResSCP[is.nan(ResSCP$Obs_Exp),"Obs_Exp"] = 0
-	      ResSCP$LObs_Exp  <- sprintf("%9.3f",ResSCP$Obs_Exp)
-	      
-	      # sum of county values within place - NONE.
-	      
-	      # sum tract values
-	      ResSCP$TTracts   <- pl99.index[ResSCP$plKey,"tracts"]   # total tracts for state
-	      ResSCP$LTTracts  <- sprintf("%10i",ResSCP$TTracts)
-	      #ResSCP$TractsIn  <- plxx2$TractsIn                      # in cluster tracts for state
-	      ResSCP$LTractsIn <- sprintf("%10i",ResSCP$TractsIn)
-	      ResSCP$PCTrIn    <- ResSCP$TractsIn/ResSCP$TTracts * 100
-	      ResSCP$LPCTrIn   <- sprintf("%10.2f%%",ResSCP$PCTrIn)
-	      
-	      #cat("ResSCP - Z-5211 :\n")
-	      #print(str(ResSCP))
-	      #print(head(ResSCP,30))
-	      
-	      #
-	      #   Place to County
-	      #
-	      
-              #cat("Place aggregate to County \n")
-              
-              #  County Summary  (Aggregates by County of Place from Tract)
-              coxx2 <- aggregate(cbind(Observed, Expected, TractsIn) ~ State + stID + County + stcoID, data=ResSCP, FUN=sum)  # get sum of Obs and Exp
-              
-              #cat("coxx2 - Z-5364 :\n")
-              #print(coxx2)
-              
-              #cat("Build County Aggre Table for tract\n")
-              
-              #  State/County Level Summary 
-              ResSC           <- coxx2                # number of counties
-              colnames(ResSC) <- c("State","stID","County","stcoID","Observed","Expected", "TractsIn")
-              #ResSC$stID      <- as.character(ResSC$stID)                       #>>>
-              #ResSC$State     <- as.character(st99.index[ResSC$stID,"stName"])  #???
-              ResSC$Name      <- str_pad(paste0("        ",ResSC$County),MaxColumn,"right")
-              #ResSC$FCol      <- str_pad(ResSC$County,MaxColumn,"right")
-              
-              #cat("ResSC:\n")
-              #print(ResSC)
-              #print(str(ResSC))
-          
-              # sum tract values
-              #ResSC$Observed  <- coxx2$Observed                      # ??? sum place-tract values
-              ResSC$LObserved <- sprintf("%10.3f",ResSC$Observed)
-              #ResSC$Expected  <- coxx2$Expected                      # ???
-              ResSC$LExpected <- sprintf("%10.3f",ResSC$Expected)
-              ResSC$Obs_Exp   <- ResSC$Observed / ResSC$Expected
-              ResSC[is.nan(ResSC$Obs_Exp),"Obs_Exp"] = 0
-              ResSC$LObs_Exp  <- sprintf("%9.3f",ResSC$Obs_Exp)
-              
-              # Now at county level - set TCounty and CountyIn = 1
-              ResSC$TCounty   <- 1                                   # total counties for state
-              ResSC$LTCounty  <- sprintf("%10i",ResSC$TCounty)
-              ResSC$CountyIn  <- 1                                   # in cluster counties for state
-              ResSC$LCountyIn <- sprintf("%10i",ResSC$CountyIn)
-              
-              ResSC$PCCoIn    <- ResSC$CountyIn/ResSC$TCounty * 100
-              ResSC$LPCCoIn   <- sprintf("%10.2f%%",ResSC$PCCoIn)
-              
-              # sum tract values
-              ResSC$TTracts   <- co99.index[ResSC$stcoID,"tracts"]   # total tracts for state  (should sum, but this feels better)
-              ResSC$LTTracts  <- sprintf("%10i",ResSC$TTracts)
-              
-              #ResSC$TractsIn  <- coxx2$TractsIn                      # ??? in cluster tracts for state
- 
-              ResSC$LTractsIn <- sprintf("%10i",ResSC$TractsIn)
-              ResSC$PCTrIn    <- ResSC$TractsIn/ResSC$TTracts * 100
-              ResSC$LPCTrIn   <- sprintf("%10.2f%%",ResSC$PCTrIn)
-              
-              #cat("ResSC aggr from ResSCP\n")
-              #print(str(ResSC))
-              #print(head(ResSC,20))
-              
-              #cat("ResSC$Obs_Exp:",ResSC$Obs_Exp,"\n")
-              #cat(typeof(ResSC$Obs_Exp),"\n")
-              
-              #  
-              #  County aggregates to State level
-              #
-	      
-              #cat(" County aggregate To State (from tract->Place-> County) \n")
-           
-              stxx2 <- aggregate(cbind(Observed, Expected, CountyIn, TractsIn) ~ State + stID , data=ResSC, FUN=sum)  # get sum of Obs and Exp
-                
-              # the assumption is the rows in xx1 and xx2 are in the same order and match - one to one after
-              #  the two aggregations.
-              #cat("stxx2:\n")
-              #print(stxx2)
-              
-              #cat("st99.index\n")
-              #print(st99.index[,c("ID", "county_00", "county_10", "tracts_00", "tracts_10")])
-              
-              #cat("build state aggre table for tract.","\n")
-              
-              #  State Level Summary (Aggregates of County to State)
-              ResSt           <- NULL
-              #cat("dim(stxx2):",dim(stxx2),"\n")
-              
-              ResSt           <- stxx2
-              colnames(ResSt) <- c("State", "stID", "Observed", "Expected", "CountyIn", "TractsIn")
-              #ResSt$stID      <- as.character(ResSt$stID)    # ???
-              #ResSt$State     <- as.character(st99.index[ResS$stID,"stName"])  # >>>
-              ResSt$Name      <- str_pad(paste0("    ",ResSt$State),MaxColumn,"right")
-              #ResSt$FCol      <- str_pad(ResSt$State,MaxColumn,"right")
-          
-              #cat("ResSt:\n")
-              #print(str(ResSt))
-              #print(ResSt)
-              
-              # sum tract values
-              #ResSt$Observed  <- stxx2$Observed                      # sum  tract values
-              ResSt$LObserved <- sprintf("%10.3f",ResSt$Observed)
-              #ResSt$Expected  <- stxx2$Expected
-              ResSt$LExpected <- sprintf("%10.3f",ResSt$Expected)
-              ResSt$Obs_Exp   <- ResSt$Observed / ResSt$Expected
-              ResSt[is.nan(ResSt$Obs_Exp),"Obs_Exp"] = 0
-              ResSt$LObs_Exp  <- sprintf("%9.3f",ResSt$Obs_Exp)
-              
-              # New state values
-              ResSt$TState    <- 1
-              ResSt$StatesIn  <- 1
-              
-              # sum county values
-              ResSt$TCounty   <- st99.index[ResSt$stID,"county"]   # total counties for state
-              ResSt$LTCounty  <- sprintf("%10i",ResSt$TCounty)
-              #ResSt$CountyIn  <- stxx2$CountyIn                      # in cluster counties for state
-              ResSt$LCountyIn <- sprintf("%10i",ResSt$CountyIn)
-              
-              ResSt$PCCoIn    <- ResSt$CountyIn/ResSt$TCounty * 100
-              ResSt$LPCCoIn   <- sprintf("%10.2f%%",ResSt$PCCoIn)
-              
-              # sum tract values
-              ResSt$TTracts   <- st99.index[ResSt$stID,"tracts"]   # total tracts for state
-              ResSt$LTTracts  <- sprintf("%10i",ResSt$TTracts)
-              #ResSt$TractsIn  <- stxx2$TractsIn                      # in cluster tracts for state
-              ResSt$LTractsIn <- sprintf("%10i",ResSt$TractsIn)
-              ResSt$PCTrIn    <- ResSt$TractsIn/ResSt$TTracts * 100
-              ResSt$LPCTrIn   <- sprintf("%10.2f%%",ResSt$PCTrIn)
-              
-              #  State Header with County
-              
-              #cat("ResS Z-5913 :\n")
-              #print(str(ResS))
-              #print(head(ResS,10))
-              
-              ResSOrd <- order(ResSt$Obs_Exp,decreasing=TRUE)
-              #cat("ResSOrd:",ResSOrd,"\n")
-              
-              #cat("starting Tract Report\n")
-              # report 
-              
-              lenStList   <- length(ResSOrd)
-              
-              # state Loop
-              for (inSt in seq_len(lenStList)) {
-                 writeLines(" ",con=TxtCon)
-                 # state header
-                 writeLines(paste0(str_pad("  State",MaxColumn,"right"),AccumHdrSt),con=TxtCon)
-                 
-                 inSSt        <- ResSOrd[inSt]
-                 CurStID      <- ResSt[inSSt,"stID"] # Get state ID for this loop.
-                 
-                 # State Summary Aggregate
-                 wStr <- unlist(ResSt[inSSt,c("Name","LObserved","LExpected","LObs_Exp",
-                               "LTCounty","LCountyIn","LPCCoIn",
-                               "LTTracts","LTractsIn","LPCTrIn")],use.names=FALSE)
-                              
-                 cat(wStr,"\n",sep="",append=TRUE, file=TxtCon)
-                   
-	         #  Aggregate to County
-                 
-                 #  Select counties within current state
-                 
-                 CoWrkRes     <- ResSC[ResSC$stID == CurStID,]    # get aggre for all counties in state.
-                 CoWrkOrd     <- order(CoWrkRes$Obs_Exp,decreasing=TRUE)
-                 lenCoWrkRes  <- length(CoWrkOrd)      # number of counties for state in cluster.
-
-                 #cat("County agg within State:",CurStID,"\n")
-                 #cat("Length of County Work:",lenCoWrkRes,"\n")
-                 #cat("CoWrkRes:\n")
-                 #print(str(CoWrkRes))
-                 #print(head(CoWrkRes,20))
-                 
-                 #cat("CoWrkOrd:",CoWrkOrd,"\n")
-                  
-                 # county loop
-                 for (inCo in seq_len(lenCoWrkRes)) {
-                    # county header 
-                    writeLines(" ",con=TxtCon)
-                    writeLines(paste0(str_pad("      County",MaxColumn,"right"),AccumHdrCo),con=TxtCon)
-                 
-                    inSCo       <- CoWrkOrd[inCo]
-                    CurStcoID   <- ResSC[inSCo,"stcoID"]  # get current county id
-                    
-                    # County Aggre Record
-                    wStr      <- unlist(CoWrkRes[inSCo,c("Name","LObserved","LExpected","LObs_Exp",
-		                            "LTTracts","LTractsIn","LPCTrIn")],use.names=FALSE)
-		                            
-		    cat(wStr,"\n",sep="",file=TxtCon,append=TRUE)
-		    		    
-                    # Aggregate to Place
-                    #  get list of place summary records for state and county
-                    plWrkRes     <- ResSCP[ResSCP$stID == CurStID & ResSCP$stcoID == CurStcoID,]
-                    
-                    plWrkOrd     <- order(plWrkRes$Obs_Exp,decreasing=TRUE)
-                    
-                    lenPlWrkRes  <- length(plWrkOrd)       # number of entries
-
-                    #cat("Place agg within State/County:",CurStcoID,"\n")
-                    #cat("Length of Place Work:",lenPlWrkRes,"\n")
-                    #cat("plWrkRes:\n")
-                    #print(str(plWrkRes))
-                    #print(head(plWrkRes,20))
-                    
-                    #cat("plWrkOrd:",plWrkOrd,"\n")
-                    
-                    # Place Loop
-                    for (inPl in seq_len(lenPlWrkRes)) {
-                       writeLines(" ",con=TxtCon)
-                       writeLines(paste0(str_pad("          Placename",MaxColumn,"right"),AccumHdrPl),con=TxtCon)
-                 
-                       inSPl     <- plWrkOrd[inPl]    # ordered index to placename data line
-                       
-                       CurPlKey  <- plWrkRes[inSPl,"plKey"]   # current entry
-                       #cat("CurPlKey:",CurPlKey,"\n")
-                       
-                       # Place Aggre Record - header.
-                       wStr     <- unlist(plWrkRes[inSPl,c("Name","LObserved","LExpected","LObs_Exp",
-                                          "LTTracts","LTractsIn","LPCTrIn")],use.names=FALSE)
-                       
-                       cat(wStr,"\n",sep="",file=TxtCon,append=TRUE)
-                 
-                       # Tract detail within place
-                       
-                       #cat("Tract Detail for place :",CurPlKey,"\n")
-                       
-                       trLocList  <- GisLocList[GisLocList$plKey == CurPlKey,]
-                       #cat("trLocList DF:\n")
-                       #print(str(trLocList))
-                       #print(trLocList)
-                       
-                       trLocOrd   <- order(trLocList$Obs_Exp,decreasing=TRUE)
-                       lenTrLoc   <- length(trLocOrd)
+            #cat("GisLocList - len:",lenGisLoc,"  typeof:",typeof(GisLocList),"  class:",class(GisLocList),"\n")
                      
-                       #cat("Tract Detail within State/County/Place:",CurPlKey,"\n")
-                       #cat("Length of Tract Work:",lenTrLoc,"\n")
-                       #cat("trLocList:\n")
-                       #print(str(trLocList))
-                       #print(head(trLocList,20))
+            if (lenGisLoc > 0) { # there are locations in the cluster.
+               #cat("Text:Gathering location records:",GisLocList$LOC_ID,"\n")
+               
+               GisLocList$LOC_ID <- as.character(GisLocList$LOC_ID)
+               #  Bug - ID was used as factor not character.
+                 
+               names(GisLocList) <- c("LOC_ID","Cluster","Observed","Expected","Obs_Exp","RelRisk","Category")
+               
+               # based on type of data - LocIDType = 2, 5, 11 (State, St/Co, St/Co/Tr)
+               
+               if (LocIDType == 2) {
+                  leadBlk            <- "    "
+                  #  add additional fields for State Location for aggregation
+                  
+                  GisLocList$stID    <- GisLocList$LOC_ID
+                  GisLocList$State   <- st99.index[GisLocList$stID,"stName"]
+                  #GisLocList$HsaID   <- ""
+                  #  Key # 1 - stcoID   ->  State/County code
+                  GisLocList$stcoID  <- ""
+                  GisLocList$County  <- ""
+                  GisLocList$plKey   <- ""
+                  GisLocList$Place   <- ""
+                  
+                  #  Counts
+                  GisLocList$TState   <- 1
+                  GisLocList$StateIn  <- 1
+                  #GisLocList$THsas    <- st99.index(GisLocList$stID,"hsas"]
+                  #GisLocList$THsasIn  <- st99.index(GisLocList$stID,"hsas"]
+                  GisLocList$TCounty  <- st99.index[GisLocList$stID,"county"]
+                  GisLocList$CountyIn <- st99.index[GisLocList$stID,"county"]
+                  GisLocList$TTracts  <- st99.index[GisLocList$stID,"tracts"]
+                  GisLocList$TractsIn <- st99.index[GisLocList$stID,"tracts"]
+               }
+               
+               #if (LocIDType == 3) {   # State/HSAs
+               #   leadBlk            <- "        "
+               #   #  add additional fields for State/Hsas Location
+               #   GisLocList$HsaID   <- str_trim(GisLocList$LOC_ID)
+               #   GisLocList$stID    <- hs99.index[GisLocList$LOC_ID,"stID"] # go to HSA table and look up state.
+               #   GisLocList$State   <- st99.index[GisLocList$stID,"stName"]
+               #   GisLocList$stcoID  <- ""
+               #   GisLocList$County  <- ""
+               #   GisLocList$plKey   <- ""
+               #   GisLocList$Place   <- ""
+               #   
+               #   # Counts
+               #   GisLocList$TState   <- 0
+   	    #   GisLocList$StateIn  <- 0
+   	    #   GisLocList$THsas    <- 1
+   	    #   GisLocList$HsasIn   <- 1
+   	    #   GisLocList$TCounty  <- hs99.index[GisLocList$HsaID,"county"]
+   	    #   GisLocList$CountyIn <- hs99.index[GisLocList$HsaID,"county"]
+   	    #   GisLocList$TTracts  <- hs99.index[GisLocList$HsaID,"tracts"]
+   	    #   GisLocList$TractsIn <- hs99.index[GisLocList$HsaID,"tracts"]
+               #   
+               #}
+               
+               if (LocIDType == 5) {
+                  leadBlk            <- "        "
+                  #  add additional fields for State/County Location
+                  GisLocList$stID    <- str_sub(GisLocList$LOC_ID,1,2)
+                  GisLocList$State   <- st99.index[GisLocList$stID,"stName"]
+                  #  Key # 1 - stcoID   ->  State/County code
+                  GisLocList$stcoID  <- GisLocList$LOC_ID  # 5 digit fip code for state county
+                  GisLocList$County  <- co99.index[GisLocList$stcoID,"coName"]
+                  #GisLocList$HsaID   <- co99.index(GisLocList$stcoID,"HsaID"]
+                  GisLocList$plKey   <- ""
+                  GisLocList$Place   <- ""
+                  
+                  #  Counts
+                  GisLocList$TState   <- 0
+                  GisLocList$StateIn  <- 0
+                  #GisLocList$THsas    <- 0
+                  #GisLocList$HsasIn   <- 0
+                  GisLocList$TCounty  <- 1
+                  GisLocList$CountyIn <- 1
+                  GisLocList$TTracts  <- co99.index[GisLocList$stcoID,"tracts"]
+                  GisLocList$TractsIn <- co99.index[GisLocList$stcoID,"tracts"]
+               
+               }
+               
+               if (LocIDType == 11) {
+                  leadBlk            <- "            "
+                  #  add additional fields for State/County/Tract location
+                  GisLocList$stID    <- str_sub(GisLocList$LOC_ID,1,2)
+                  GisLocList$State   <- st99.index[GisLocList$stID,"stName"]
+                  #  Key # 1 - stcoID   ->  State/County code
+                  GisLocList$stcoID  <- substr(GisLocList$LOC_ID,1,5)  # 5 digit fip code for state county
+                  GisLocList$County  <- co99.index[GisLocList$stcoID,"coName"]
+                  #GisLocList$HsaID   <- co99.index(GisLocList$stcoID,"HsaID"]
+                 
+                  GisLocList$plKey   <- tr99.index[GisLocList$LOC_ID,"plKey"]
+                  GisLocList$Place   <- str_sub(GisLocList$plKey,6)
       
-                       #cat("trLocOrd:",trLocOrd,"\n")
-                       
-                       #writeLines(" ",con=TxtCon)
-                       writeLines(paste0(str_pad("              Census Tract",MaxColumn,"right"),DetailHdrTr),con=TxtCon)
-                       
-                       # Tract Loop
-                       for (inTr in seq_len(lenTrLoc)) {
-                          inSTr  <- trLocOrd[inTr]
-                          wStr   <- unlist(trLocList[inSTr,c("Name","LObserved","LExpected","LObs_Exp",
-                                                 "LRelRisk","LCategory")],use.names=FALSE)
-                          cat(wStr,"\n",sep="",file=TxtCon,append=TRUE)
-                       }  # end of trace detail loop with in place 
-                    
-                    }  # end of place loop with in county
-	         
-	         }  # end of county loop within state within cluster
-              } # end of state loop within cluster
-           } # end of tract cluster  (idMode = 3)
-  
-     #  #  State Header
-     #          writeLines(paste0(str_pad("State",MaxState+2,"right"),DetailHdrSt),con=TxtCon)
-     #          
-     #          lenStList  <- dim(GisLocList)[1]
-     #          #  State Detail Records
-     #          for (inSt in c(1:lenStList)) {
-     #             
-     #             inSSt <- GisLOrd[inSt]
-     #             wStr <- unlist(GisLocList[inSSt,c("LName","LObserved","LExpected","LObs_Exp",
-     #                                 "LNCounty","LNTracts","LRelRisk","LCategory")],
-     #                                 use.names=FALSE)
-     #             cat(" ",wStr,"\n",sep=" ",append=TRUE, file=TxtCon)
-     # 
-     #          }
-     #          writeLines(" ",con=TxtCon)
-     #          
-     #         
-     #         }
-     #          
-     #       }
-     #         
-     #         
-     #          SHeader        <- paste0(str_pad("State",MaxState+2,"right"),BasicHeaderL)
-     #          SHeaderT       <- paste0(str_pad("State",MaxColumn,"right"),BasicHeaderL)
-     #            
-     #          
-     #            
-     #         # Build US Accum record and output
-      #         USResSt$NStates   <- sprintf("%3i",   xx1)
-      #         USResSt$NCounties <- sprintf("%5i",   xx2$county) 
-      #         USResSt$NTracts   <- sprintf("%7i",   xx2$tract)
-      #         USResSt$Observed  <- sprintf("%10i",  xx2$Observed)
-      #         USResSt$Expected  <- sprintf("%10.3f",xx2$Expected)
-      #         USResSt$Obs_Exp   <- sprintf("%10.3f",xx2$Observed / xx2$Expected)
-      #         USResSt[is.nan(USResSt$Obs_Exp),"Obs_Exp"] = 0
-      #         
-      #         # report of State Detail - LOC records
-      #         
-      #         GisLocHeader      <- paste0("        States      ",DetailHdrTr,DetailExtHdr)
-      #         GisLocHeaderT     <- paste0(str_pad("        States      ",MaxColumn,"right"),DetailHdrTr,DetailExtHdr2)
-#
-      #         # Tier 1 - State Header 
-      #          
-      #         writeLines(SHeaderT,con=TxtCon)
-      #        
-      #         for (iS in 1:NumS) {   # Loop at Tier 1
-      #            # Tier 1 - State Data
-      #            #cat("Text:Rep-State.\n")
-      #            
-      #            cat(unlist(ResSt[OrdS[iS],c("FCol","Observed","Expected","Obs_Exp","TotTracts","Tracts_In","PrcTracts")]),"\n",sep=" ",file=TxtCon,append=TRUE)
-      #      
-      #     
-      #         }
-   #
-   #
-   #
-      #      } 
-      #         
-      #      
-      ##      #
-       #     # State List - and aggregate needed fields
-       #     #   State Accum
-       #     #
-       #     ####
-       #    
-       ##     xx2 <- aggregate(cbind(Observed, Expected) ~ State + stID , data=GisLocList, FUN=sum)  # get sum of Obs and Exp
-        #         
-        #    # the assumption is the rows in xx1 and xx2 are in the same order and match - one to one after
-        #    #  the two aggregations.
-        #    xLen           <- MaxState+2
-        #      
-        #    ResS           <- xx1   # number of tracts
-        #    colnames(ResS) <- c("State","stID","Tracts_In")
-        #    ResSt$stID      <- as.character(ResSt$stID)
-        #    ResSt$State     <- as.character(ResSt$State)
-        #    ResSt$RName     <- str_pad(ResSt$State,xLen,"right")
-        #    ResSt$FCol      <- str_pad(ResSt$State,MaxColumn,"right")
-        # 
-        #    ResSt$Observed  <- sprintf("%10i",xx2$Observed)
-        #    ResSt$Expected  <- sprintf("%10.3f",xx2$Expected)
-        #    ResSt$Obs_Exp   <- sprintf("%10.3f",xx2$Observed / xx2$Expected)
-        #    ResSt[is.nan(ResSt$Obs_Exp),"Obs_Exp"] = 0
-        #    
-        #    ResSt$TotTracts <- st99.index[ResSt$stID,TractN]
-        #    
-        #    ResSt$PrcTracts <- sprintf("%10.3f%%",ResSt$Tracts_In/ResSt$TotTracts * 100)
-        #    ResSt$Tracts_In <- sprintf("%10i",ResSt$Tracts_In)
-        #    
-        #    ResSt$TotTracts <- sprintf("%10i",ResSt$TotTracts)
-        #      
-        #    SHeader        <- paste0(str_pad("State",MaxState+2,"right"),BasicHeaderL)
-        #    SHeaderT       <- paste0(str_pad("State",MaxColumn,"right"),BasicHeaderL)
-        #    
-        #    
-        #    if (LocIDType >= 5) {
-        #       ####
-        #       #
-        #       # State/County List - and aggregate needed fields
-        #       #    County Accum
-        #       #
-        #       ####
-        #      
-        #       xx1 <- aggregate(Observed ~  St_County + State + County + stcoID, data=GisLocList, FUN=length)   # get number of tracts
-        #       xx2 <- aggregate(cbind(Observed, Expected) ~ St_County + State + County + stcoID , data=GisLocList, FUN=sum)  # get sum of Obs and Exp
-        #         
-        #       # the assumption is the rows in xx1 and xx2 are in the same order and match - one to one after
-        #       #  the two aggregations.
-        #       xLen            <- MaxState+MaxCounty+2
-        #      
-        #       ResSC           <- xx1   # number of tracts
-        #       colnames(ResSC) <- c( "State_County","State","County","stcoID","Tracts_In")
-        #       ResSC$State     <- as.character(ResSC$State)
-        #       ResSC$State_County <- as.character(ResSC$State_County)
-        #       ResSC$County    <- as.character(ResSC$County)
-        #     
-        #       ResSC$RName     <- str_pad(ResSC$State_County,xLen,"right")
-        #       ResSC$FCol      <- str_pad(paste0("   ",ResSC$County,sep=""),MaxColumn,"right")
-        #  
-        #       ResSC$Observed  <- sprintf("%10i",xx2$Observed)
-        #       ResSC$Expected  <- sprintf("%10.3f",xx2$Expected)
-        #       ResSC$Obs_Exp   <- sprintf("%10.3f",xx2$Observed / xx2$Expected)
-        #       ResSC[is.nan(ResSC$Obs_Exp),"Obs_Exp"] = 0
-        #     
-        #       ResSC$TotTracts <- co99.index[ResSC$stcoID,TractN]
-        #       ResSC$PrcTracts <- sprintf("%10.3f%%",ResSC$Tracts_In/ResSC$TotTracts * 100)
-        #       ResSC$Tracts_In <- sprintf("%10i",ResSC$Tracts_In)
-        #       ResSC$TotTracts <- sprintf("%10i",ResSC$TotTracts)
-        #       
-        #       SCHeader        <- paste0(str_pad("State/County",xLen,"right"),BasicHeaderL)
-        #       SCHeaderT       <- paste0(str_pad("   County",MaxColumn,"right"),BasicHeaderL)
-        #    
-        #       if (LocIDType >= 11) {
-        #    
-        #          ####
-        #          #
-        #          # State/County/Place List - and aggregate needed fields
-        #          #   Place Accum
-        #          #
-        #          ####
-        #           
-        #          xx1 <- aggregate(Observed ~   St_Co_Place + St_County + Place + plKey, data=GisLocList, FUN=length)               # count number of locations
-        #          xx2 <- aggregate(cbind(Observed, Expected) ~ St_Co_Place + St_County + Place + plKey, data=GisLocList, FUN=sum)  # sum Observed and Expected values
-        #            
-        ##          #  the two aggregations.
-         #           
-         #         # problem with below code (???).
-         #         xLen               <- MaxState+MaxCounty+MaxPlace+2
-         #         
-         #         ResSCP             <- xx1                                              # number of locations
-         #         colnames(ResSCP)   <- c("State_County_Place", "State_County", "Place", "plKey","Tracts_In")
-         #         ResSCP$State_County_Place <- as.character(ResSCP$State_County_Place)
-         #         ResSCP$State_County <- as.character(ResSCP$State_County)
-         #         ResSCP$Place       <- as.character(ResSCP$Place)
-         #         ResSCP$RName       <- str_pad(ResSCP$State_County_Place, xLen, "right")
-         #         ResSCP$FCol        <- str_pad(paste0("      ",ResSCP$Place,sep=""),MaxColumn,"right")
-         # 
-         #         # Get tracts in cluster from xx2.
-         #         ResSCP$Observed    <- sprintf("%10i",xx2$Observed)
-         #         ResSCP$Expected    <- sprintf("%10.3f",xx2$Expected)
-         #         ResSCP$Obs_Exp     <- sprintf("%10.3f",xx2$Observed / xx2$Expected)
-         #         ResSCP[is.nan(ResSCP$Obs_Exp),"Obs_Exp"] = 0
-         #   
-         #         # Get total tracts in St/Co/Place area from PL99 table
-         #    
-         #         ResSCP$TotTracts   <- 0
-         #         ResSCP$TotTracts   <- pl99.index[ResSCP$plKey,TractN] 
-         #       
-         #         ResSCP$PrcTracts   <- sprintf("%10.3f%%",ResSCP$Tracts_In/ResSCP$TotTracts*100)
-         #         ResSCP$Tracts_In   <- sprintf("%10i",ResSCP$Tracts_In)
-         #       
-         #         ResSCP$TotTracts   <- sprintf("%10i",ResSCP$TotTracts)
-         #                 
-         #         SCPHeader          <- paste0(str_pad("State/County/Place",xLen,"right"),BasicHeaderL)
-         #         SCPHeaderT         <- paste0(str_pad("      Place",MaxColumn,"right"),BasicHeaderL)
-         #
-         #      }
-         #   } 
-         #   #
-         #   #  data.frames are all setup for the report.
-         #   #
-         #   #  All list completed - now select and print                          
-         #                
-         #   # Tier report - State -> State/County -> State/County/Place -> Census Tract
-         #     
-         #   #  Tiered Summary 
-         #   #
-         #   #  Updated report to loop through entries instead of printing structure.
-         #   #  After each State entry (Level=1), if the user wants more levels (tiers)
-         #   #    of information (state/county, state/county/place and census tract), 
-         #   #    they can specify the report level:  
-         #   #        1=State,  
-         #   #        2=State, State/County 
-         #   #        3=State, State/County, State/County/Place,
-         #   #        4=State, State/County, State/County/Place, Census Tract.
-         #   #    "RepSt" and "RepTierLevel".
-         #   #
-         #   RepTier  <-  4   # all.
-         ##   if (LocIDType == 2) {
-          #      # minimum tier = 1
-          #      RepTier = 1
-          #W  }
-          #  if (LocIDType == 5) {
-          #      if (RepTier > 2) {
-          #         # reduce report tier appropriatelys
-          #         RepTier = 2
-          #      }
-          #  }
-          #  if (LocIDType == 11) {
-          #      if (RepTier > 4) {
-          #         # reduce report tier appropriately
-          #         RepTier = 4
-          #      }
-          #  }
-          #  
-          #  writeLines("   Tiered Summary of locations in Cluster list alphabetically by Name:",con=TxtCon)        
-          #  writeLines(" ",con=TxtCon)
-          #    
-          #3  NumS       <- dim(ResS)[1]          # number of rows - state
-          #  OrdS       <- order(ResSt$State)
-          #  ResSt$Key   <- as.character(ResSt$State)
-          #    
-          #  # Tier 1 - State Header 
-          #    
-          #  writeLines(SHeaderT,con=TxtCon)
-          #    
-          #  for (iS in 1:NumS) {   # Loop at Tier 1
-          #     # Tier 1 - State Data
-          #     #cat("Text:Rep-State.\n")
-          #        
-          #     cat(unlist(ResSt[OrdS[iS],c("FCol","Observed","Expected","Obs_Exp","TotTracts","Tracts_In","PrcTracts")]),"\n",sep=" ",file=TxtCon,append=TRUE)
-          #  
-          #     if (RepTier >=2) {
-          #   
-          #        #cat("Text:Rep-State/County.\n")
-          #     
-          #        Key_S     <- ResSt[iS,"Key"]
-          #     
-          #        ###
-          #        #  Find State/County rows that match this state
-          #        ###
-          #       
-          #        wResSC    <- ResSC[ResSC$State == Key_S,]
-          #               
-          #        NumSC     <- dim(wResSC)[1]         # number of rows
-          #        OrdSC     <- order(wResSC$State_County)
-          #       
-          #        # Tier 2 - State/County Header
-          #       
-          #        writeLines(SCHeaderT,con=TxtCon)
-          #  
-          #        for (iSC in 1:NumSC)  {   # loop at Tier 2
-          #           # Tier 2 - State/County DATA
-          #           #cat("Text:Rep-State/County Records:",iSC,"\n")
-          #           
-          #           cat(unlist(wResSC[OrdSC[iSC],c("FCol","Observed","Expected","Obs_Exp","TotTracts","Tracts_In","PrcTracts")]),"\n",sep=" ",file=TxtCon,append=TRUE)
-          #        
-          #           # have State/County - now find all State/County/Places within containing census tracts.
-            
-           #          if (RepTier >= 3) {
-           #             # Tier 3 - State/County/Tract
-           #          
-           #             Key_S_C    <- wResSC[OrdSC[iSC],"State_County"]
-           #     
-           #             ###
-           #             #  Find State/County/Place rows that match this state/county
-           #             ###
-           #      
-           #             wResSCP    <- ResSCP[ResSCP$State_County == Key_S_C,]   # have rows - should be > 1
-           #      
-           #             # Tier 3 - State/County/Place Header
-           #          
-           #             writeLines(SCPHeaderT,con=TxtCon)
-           #     
-           #             NumSCP     <- dim(wResSCP)[1]
-           #             OrdSCP     <- order(wResSCP$State_County_Place)
-           #          
-           #             for (iSCP in  1:NumSCP) { # Loop at Tier 3
-           #                #  Tier 3 - State/County/Place DATA
-           #                #cat("Text:S/C/P:",iSCP,"\n")
-           #          
-           #                writeLines(" ",con=TxtCon)  # blank at start of Places
-           #          
-           #                cat(unlist(wResSCP[iSCP,c("FCol","Observed","Expected","Obs_Exp","TotTracts","Tracts_In","PrcTracts")]),"\n",sep=" ",file=TxtCon,append=TRUE)   # get a SCP entry 
-           #         
-           #                ###
-           #                #  Check to see if location record is wanted.
-           #                ###
-           #             
-           #                if (RepTier >= 4) {
-           #                   # Tier 4 - State/County/Place/Tract
-           #               
-           #                   Key_S_C_P <- wResSCP[iSCP,]$State_County_Place
-           #           
-           #                   wLoc      <- GisLocList1[GisLocList1$St_Co_Place == Key_S_C_P,]   # get associate rows to state/county/place
-           #               
-           #                   # Tier 4 - State/County/Place/Tract Header
-           #               
-           #                   writeLines(GisLocHeaderT,con=TxtCon)
-           #               
-           #                   NumLoc    <- dim(wLoc)[1]
-           #               
-           #                   for (iLoc in 1:NumLoc) {  # Loop at Tier 4
-           #                      # Tier 4 - State/County/Place/Trace DATA
-           #                      cat(unlist(wLoc[iLoc,c("FCol","Observed","Expected","Obs_Exp","RelRisk","Category")]),"\n",sep=" ",file=TxtCon,append=TRUE)                             
-           #                   }
-           #                }      
-           #             }  # End of loop for level 3 - St/Co/Place
-           #           
-           #             writeLines(" ",con=TxtCon)  # blank at start of Places
-           #          }       
-           #       } # end of loop for Level 2 - St/Co
-           #    }
-           # } # end of level 1 loop    
-            writeLines(" ",con=TxtCon)
-            writeLines(" ",con=TxtCon)
-            
-            #  Wrap up reports.            
-            writeLines(" ",con=TxtCon)
-            writeLines(" ",con=TxtCon)
-   
-         } else {  
-            # no locations in cluster
-            writeLines("*** There are no locations found for this cluster ***",con=TxtCon)
-            writeLines(" ",con=TxtCon)
-            writeLines(" ",con=TxtCon)
-         }             
+                  #  Counts
+                  GisLocList$TState   <- 0
+                  GisLocList$StateIn  <- 0
+                  #GisLocList$THsas    <- 0
+                  #GisLocList$HsasIn   <- 0
+                  GisLocList$TCounty  <- 0
+                  GisLocList$CountyIn <- 0
+                  GisLocList$TTracts  <- 1
+                  GisLocList$TractsIn <- 1
+               
+               }
+               
+               #
+               #  Design:
+               #     US summary record
+               #       Cluster summary record (CLUS)
+               #          State Detailed (LOC)
+               #
+               #     US summary record
+               #       Cluster summary record (CLUS)
+               #          State Accum 
+               #             County Detailed (LOC)
+               #
+               #  Alternate # 1
+               #
+               #     US summary record
+               #       Cluster summary record (CLUS)
+               #          State Accum 
+               #             County Detailed (LOC)
+               #
+               #     US summary record
+               #       Cluster summary record (CLUS)
+               #          State Accum
+               #             County Accum
+               #                Place Accum
+               #                   Tract Detailed (LOC)
+               #
+               #  Alternate # 2
+               #
+               #     US summary record
+               #       Cluster summary record (CLUS)
+               #          State Accum 
+               #             Hsa Accum 
+               #                County Detailed (LOC)
+               #
+               #     US summary record
+               #       Cluster summary record (CLUS)
+               #          State Accum
+               #             Hsa Accum 
+               #                County Accum
+               #                   Place Accum
+               #                      Tract Detailed (LOC)
+               #
+               #
+               #
+               #  Now we have the literal names.  We can calculate the widths of each element.
+               #
+             
+               #  Get maximum width of each field - State, County, Place names
+               MaxState      <- max(sapply(GisLocList$State,    function(x) nchar(as.character(x))))
+               #MaxHsa        <- max(sapply(GisLocList$Hsa,      function(x) nchar(as.character(x))))
+               MaxCounty     <- max(sapply(GisLocList$County,   function(x) nchar(as.character(x))))
+               MaxPlace      <- max(sapply(GisLocList$Place,    function(x) nchar(as.character(x))))
+               MaxCategory   <- max(sapply(GisLocList$Category, function(x) nchar(as.character(x)))) + 2  
+               if (MaxCategory <= 14)  MaxCategory = 14   # minimum category width
+                 
+               MaxColumn     <- 11 + 12 + 2   # standard column max.
+               if (MaxColumn < (MaxState + 2))  MaxColumn <- MaxState + 2
+               #if (MaxColumn < (MaxHsa + 2))    MaxColumn <- MaxHsa + 2
+               if (MaxColumn < (MaxCounty + 5)) MaxColumn <- MaxCounty + 5
+               if (MaxColumn < (MaxPlace + 10)) MaxColumn <- MaxPlace + 10
+                 
+               # ssscccppplll = 12 characters
+               # Longest  State + 2, Hsa + 2, County + 3, Place + 6, Location + 12 (11+12)  - all plus 2
+               # 
+               
+               #
+               #  Now finish creating any fields that are based on column width.
+               #
+               #  Create format strings using max string widths.  (space from left padding sections)
+               
+               SCPFormat       <- paste0("%-",MaxState,"s %-",MaxCounty,"s %-",MaxPlace,"s")    # State/County/Place
+               SCFormat        <- paste0("%-",MaxState,"s %-",MaxCounty,"s")                    # State/County
+               SFormat         <- paste0("%-",MaxState,"s")                                     # State
+      
+               #  Additional Fields based on column sizes.
+               
+               GisLocList$RIName        <- str_pad(GisLocList$LOC_ID,MaxColumn,"right")
+               # FIPS code.
+               GisLocList$FICol         <- str_pad(paste0("         ",GisLocList$LOC_ID),MaxColumn,"right")
+               
+                
+               if (idMode == 1) {
+                  # setup State labels
+                  GisLocList$Trailer <- sprintf(SFormat,GisLocList$State) 
+                  GisLocList$Name    <- str_pad(paste0("  ",GisLocList$State),MaxColumn,"right")
+               }
+               if (idMode == 2) {
+                  # setup State/County labels
+   	       GisLocList$Trailer <- sprintf(SCFormat,GisLocList$State,GisLocList$County) 
+   	       GisLocList$Name    <- str_pad(paste0("      ",GisLocList$County),MaxColumn,"right")
+               }
+               if (idMode == 3) {
+                  # setup State/County/Place/Tract labels
+   	       GisLocList$Trailer <- sprintf(SCPFormat,GisLocList$State,GisLocList$County,GisLocList$Place) 
+   	       GisLocList$PName   <- str_pad(paste0("          ",GisLocList$Place),MaxColumn,"right")
+                  GisLocList$Name    <- str_pad(paste0("                ",GisLocList$LOC_ID),MaxColumn,"right")
+               }
+       
+               #print(str(GisLocList))
+               
+               #
+               #  State Detailed
+               #  Hsa Detailed
+               #  County Detailed
+               #  Tract Detailed
+               #
+               #  US Accum
+               #  State Accum
+               #  County Accum
+               #
+               #  US Name
+               #  State Name
+               #  State/County Name
+               #  State/County/Place Name
+               #
+               
+               # Numbers sections:
+               #    State Accum
+               #    Hsa Accum
+               #    County Accum
+               #    Place Accum
+               
+               #    Titles
+               
+               #
+               #  Update to include HSA counts - may need to have as option.
+               #
+               
+               #   Basic Pattern for ODE, States, Counties, Tracts
+               TObsExpODE        <- "  Observed  Expected  Obs/Exp"
+               #                     12345678901234567890123456789
+               #                         10        10        9
+               
+               TotalHdrUS        <- "   TotStates  TotCounty  TotTracts"
+               
+               TAccSt            <- "    TotSts  InClsSts PerStInCls"
+               TAccCo            <- "   TotCnty InClsCnty PerCoInCls"
+               TAccTr            <- "   TotTrts InClsTrts  PerTInCls"
+               #                     1234567890123456789012345678901
+               #                         10        10       11
+              
+               TTotSt            <- "   TotCnty   TotTrts"   # for state detail record
+               #                     12345678901234567890
+               #                         10        10
+               
+               catStr            <- str_pad("Category",MaxCategory,"left")
+              
+               DetailExtHdr      <- paste0("   RelRisk ",catStr,"  St/Co/Place")
+               DetailExtHdr2     <- paste0("   RelRisk ",catStr)
+               #                            1234567890
+               #                                10
+               
+               #
+               # US Summary header for cluster
+               #
+               AccumHdrUSAll     <- paste0(TObsExpODE,TAccSt,TAccCo,TAccTr)
+      
+               #
+               # for State Data
+               #
+               # TotalHdrUS
+               AccumHdrUS        <- paste0(TObsExpODE,TAccSt,TAccCo,TAccTr)        # collection of states in cluster
+               DetailHdrSt       <- paste0(TObsExpODE,TTotSt,DetailExtHdr2)  # represents one state
+               
+               # for County Data
+               AccumHdrUS        <- paste0(TObsExpODE,TAccSt,TAccCo,TAccTr)        # collection of states in cluster
+               AccumHdrSt        <- paste0(TObsExpODE,TAccCo,TAccTr) 
+               DetailHdrCo       <- paste0(TObsExpODE,TAccTr,DetailExtHdr2)  # represents one county
+               
+               # for Tract Data
+               AccumHdrUS        <- paste0(TObsExpODE,TAccSt,TAccCo,TAccTr)        # collection of states in cluster
+               AccumHdrSt        <- paste0(TObsExpODE,TAccCo,TAccTr) 
+               AccumHdrCo        <- paste0(TObsExpODE,TAccTr)            
+               AccumHdrPl        <- paste0(TObsExpODE,TAccTr)                # represents one place 
+               DetailHdrTr       <- paste0(TObsExpODE,DetailExtHdr2)
+               
+               xBasicHeaderL      <- "   Observed   Expected    Obs/Exp  TotTracts  InClsTrts  PerInClus"
+               xBasicHeaderS      <- "   Observed   Expected    Obs/Exp"
+                         
+               ####
+               # 
+               #    DETAILED RECORD numbers (same for each level).
+               #
+               ####
+                 
+               #cat(" Z-5458 - GisLocList:\n")
+               #print(str(GisLocList))
+               # format literals - detail records should not change.
+               
+               # Calculate needed values and format  (All levels)
+               GisLocList$LObserved    <- sprintf("%10i",GisLocList$Observed) 
+               GisLocList$LExpected    <- sprintf("%10.3f",GisLocList$Expected)
+               GisLocList[,"LObs_Exp"] <- sprintf("%9.3f",GisLocList[,"Obs_Exp"])
+               
+               GisLocList$LRelRisk     <- sprintf("%10.2f",GisLocList$RelRisk)
+               GisLocList$LCategory    <- str_pad(as.character(GisLocList$Category),MaxCategory,"left")
+               
+               # Used at State Level
+               
+               GisLocList$LTCounty     <- sprintf("%10i", GisLocList$TCounty)
+               GisLocList$LCountyIn    <- sprintf("%10i", GisLocList$CountyIn)
+               xTF                     <- GisLocList$TCounty == 0
+               #cat("check for zero T County:",sum(xTF),"\n")
+               if (any(xTF)) {
+                  GisLocList[xTF,"TCounty"]  <- NA
+                  GisLocList[xTF,"CountyIn"] <- NA
+               }
+               GisLocList$PCCoIn       <- GisLocList$CountyIn/GisLocList$TCounty * 100
+               GisLocList$LPCCoIn      <- sprintf("%10.2f%%", GisLocList$PCCoIn)
+               
+               # Used at State, County and Place Levels
+               GisLocList$LTTracts     <- sprintf("%10i", GisLocList$TTracts)
+               GisLocList$LTractsIn    <- sprintf("%10i", GisLocList$TractsIn)
+               xTF                     <- GisLocList$TTracts == 0
+               #cat("check for zero T tracts:",sum(xTF),"\n")
+               if (any(xTF)) {
+                  GisLocList[xTF,"TTracts"]  <- NA
+                  GisLocList[xTF,"TractsIn"] <- NA
+               }
+               GisLocList$PCTrIn       <- GisLocList$TractsIn/GisLocList$TTracts * 100
+               GisLocList$LPCTrIn      <- sprintf("%10.2f%%", GisLocList$PCTrIn)
+     	    
+               #GisLocHeader            <- paste0("   Census Tract  ",DetailHdrTr,DetailExtHdr)
+               #GisLocHeaderT           <- paste0(str_pad("        Census Tract",MaxColumn,"right"),DetailHdrTr,DetailExtHdr2)
            
-      } # end of For Cluster loop  
+               #cat("GisLocList - after Z-5498:\n")
+               #print(str(GisLocList))
+               ####
+               #
+               #  Build report based on level of data
+               #
+               ####
+               #cat("idMode:",idMode,"\n")
+               
+               if (idMode == 1)  {
+               
+                  #  Design:
+                  #      Cluster
+                  #         US Level - Cluster Summary
+                  #            State Detail
+                  #
+                  ##  US level - Cluster Summary
+                  #USRes$Lead       <- "                   "
+                  #
+                  #USRes$StatesIn   <- length(unique(GisLocList$stID))
+                  #USRes$LStatesIn  <- sprintf("%10i",USRes$StatesIn)
+                  #USRes$PCStIn     <- USRes$StatesIn/USRes$TStates * 100
+                  #USRes$LPCStIn    <- sprintf("%10.2f%%",USRes$PCStIn)
+                  #
+                  #USRes$CountyIn   <- sum(GisLocList$NCounty)
+                  #USRes$LCountyIn  <- sprintf("%10i",USRes$CountyIn)
+                  #USRes$PCCoIn     <- USRes$CountyIn/USRes$TCounty * 100
+                  #USRes$LPCCoIn    <- sprintf("%10.2f%%",USRes$PCCoIn)
+                  #
+                  #USRes$TractsIn   <- sum(GisLocList$NTracts)
+                  #USRes$LTractsIn  <- sprintf("%10i",USRes$TractsIn)
+                  #USRes$PCTrIn     <- USRes$TractsIn/USRes$TTracts * 100
+                  #USRes$LPCTrIn    <- sprintf("%10.2f%%",USRes$PCTrIn)
+                  #
+                  #USRes$Observed   <- sum(GisLocList$Observed)
+                  #USRes$Expected   <- sum(GisLocList$Expected)
+                  #USRes$ODE        <- USRes$Observed/USRes$Expected
+                  #USRes$LObserved  <- sprintf("%10i",USRes$Observed)
+                  #USRes$LExpected  <- sprintf("%10.3f",USRes$Expected)
+                  #USRes$LODE       <- sprintf("%9.3f",USRes$ODE)
+                  #
+                  #writeLines(paste0(" US Cluster Summary:",AccumHdrUS),con=TxtCon)   
+                  #cat(unlist(USRes[c("Lead","LObserved","LExpected","LODE",
+                  #                      "LTStates","LStatesIn","LPCStIn",
+                  #                      "LTCounty","LCountyIn","LPCCoIn",
+                  #                      "LTTracts","LTractsIn","LPCTrIn")]),"\n",sep=" ",file=TxtCon)
+               
+                  #
+                  #  State Detail
+                  #
+                  # order list in decending ODE order.
+                  
+                  GisLOrd <- order(GisLocList[,"Obs_Exp"],decreasing=TRUE)
+                  
+                  #  State Header
+                  writeLines(" ",con=TxtCon)
+                  writeLines(paste0(str_pad("  State",MaxColumn,"right"),DetailHdrSt),con=TxtCon)
+                  
+                  lenStList  <- dim(GisLocList)[1]
+                  #cat("length of state list:",lenStList,"\n")
+                  
+                  #  State Detail Records
+                  for (inSt in c(1:lenStList)) {
+                     
+                     inSSt   <- GisLOrd[inSt]
+                     wStr    <- unlist(GisLocList[inSSt,c("Name","LObserved","LExpected","LObs_Exp",
+                                      "LCountyIn","LTractsIn","LRelRisk","LCategory")],
+                                      use.names=FALSE)
+                     cat(wStr,"\n",sep="",append=TRUE, file=TxtCon)
+         
+                  }
+                  writeLines(" ",con=TxtCon)
+               }  # end of idMode = 1
+               
+               if (idMode == 2 ) {
+                  #  State/County data
+                  #
+                  #  Design:
+                  #     Cluster 
+                  #        US cluster Summary (sum)
+                  #           State Summary (agg)
+                  #              County Detail...
+                  #           State Summary (agg)
+                  #              County Detail...
+                  #
+                  #  US level - Cluster Summary
+                  #USRes$Lead       <- "                   "
+                  #
+                  #USRes$StatesIn   <- length(unique(GisLocList$stID))
+                  #USRes$LStatesIn  <- sprintf("%10i",USRes$StatesIn)
+                  #USRes$PCStIn     <- USRes$StatesIn/USRes$TStates * 100
+                  #USRes$LPCStIn    <- sprintf("%10.2f%%",USRes$PCStIn)
+                  #
+                  #USRes$CountyIn   <- sum(GisLocList$CountyIn)
+                  #USRes$LCountyIn  <- sprintf("%10i",USRes$CountyIn)
+                  #USRes$PCCoIn     <- USRes$CountyIn/USRes$TCounty * 100
+                  #USRes$LPCCoIn    <- sprintf("%10.2f%%",USRes$PCCoIn)
+                  #
+                  #USRes$TractsIn   <- sum(GisLocList$TractsIn)
+                  #USRes$LTractsIn  <- sprintf("%10i",USRes$TractsIn)
+                  #USRes$PCTrIn     <- USRes$TractsIn/USRes$TTracts * 100
+                  #USRes$LPCTrIn    <- sprintf("%10.2f%%",USRes$PCTrIn)
+                  #
+                  #USRes$Observed   <- sum(GisLocList$Observed)
+                  #USRes$Expected   <- sum(GisLocList$Expected)
+                  #USRes$ODE        <- USRes$Observed/USRes$Expected
+                  #USRes$LObserved  <- sprintf("%11i",USRes$Observed)
+                  #USRes$LExpected  <- sprintf("%10.3f",USRes$Expected)
+                  #USRes$LODE       <- sprintf("%9.3f",USRes$ODE)
+                  #
+                  #writeLines(paste0(" US Cluster Summary:",AccumHdrUS),con=TxtCon)   
+                  #cat(unlist(USRes[c("Lead","LObserved","LExpected","LODE",
+                  #                      "LTStates","LStatesIn","LPCStIn",
+                  #                      "LTCounty","LCountyIn","LPCCoIn",
+                  #                      "LTTracts","LTractsIn","LPCTrIn")]),"\n",sep=" ",file=TxtCon)
+               
+                  ####
+                  #
+                  #  States - step through list
+                  #
+                  ####
+                  #
+                  # State List - and aggregate needed fields
+                  #   State Accum
+                  #
+                  ####
+              
+                  stxx1 <- aggregate(Observed ~ State + stID, data=GisLocList, FUN=length)   # get number of counties
+                  stxx2 <- aggregate(cbind(Observed, Expected, CountyIn, TractsIn) ~ State + stID , data=GisLocList, FUN=sum)  # get sum of Obs and Exp
+                    
+                  # the assumption is the rows in xx1 and xx2 are in the same order and match - one to one after
+                  #  the two aggregations.
+                  
+                  #  State Level Summary 
+                  ResSt           <- NULL
+                  #cat("dim(stxx1):",dim(stxx1),"\n")
+                  ResSt           <- stxx1                  # by state - number of counties involved
+                  
+                  colnames(ResSt) <- c("State","stID","CountyIn")
+                  ResSt$stID      <- as.character(ResSt$stID)
+                  ResSt$State     <- as.character(st99.index[ResSt$stID,"stName"])
+                  
+                  ResSt$Name      <- str_pad(paste0("  ",ResSt$State),MaxColumn,"right")
+                  #ResSt$FCol      <- str_pad(ResSt$State,MaxColumn,"right")
+             
+                  ResSt$Observed  <- stxx2$Observed
+                  ResSt$LObserved <- sprintf("%10.3f",ResSt$Observed)
+                  ResSt$Expected  <- stxx2$Expected
+                  ResSt$LExpected <- sprintf("%10.3f",ResSt$Expected)
+                  ResSt$Obs_Exp   <- ResSt$Observed / ResSt$Expected
+                  ResSt[is.nan(ResSt$Obs_Exp),"Obs_Exp"] = 0
+                  ResSt$LObs_Exp  <- sprintf("%9.3f",ResSt$Obs_Exp)
+                   
+                  ResSt$TCounty   <- st99.index[ResSt$stID,"county"]
+                  ResSt$LTCounty  <- sprintf("%10i",ResSt$TCounty)
+                  ResSt$CountyIn  <- stxx2$CountyIn
+                  ResSt$LCountyIn <- sprintf("%10i",ResSt$CountyIn)
+                  
+                  ResSt$PCCoIn    <- ResSt$CountyIn/ResSt$TCounty * 100
+                  ResSt$LPCCoIn   <- sprintf("%10.2f%%",ResSt$PCCoIn)
+                  
+                  ResSt$TTracts   <- st99.index[ResSt$stID,"tracts"]
+                  ResSt$LTTracts  <- sprintf("%10i",ResSt$TTracts)
+                  ResSt$TractsIn  <- stxx2$TractsIn
+                  ResSt$LTractsIn <- sprintf("%10i",ResSt$TractsIn)
+                  ResSt$PCTrIn    <- ResSt$TractsIn/ResSt$TTracts * 100
+                  ResSt$LPCTrIn   <- sprintf("%10.2f%%",ResSt$PCTrIn)
+                
+                  #  State Header with County Detail
+                  
+                  ResSOrd <- order(ResSt$Obs_Exp,decreasing=TRUE)
+                  
+                  lenStList   <- length(ResSOrd)  # get number of states from aggregate
+                  #cat("Length of state Aggreg List:",lenStList,"\n")
+                  
+                  for (inSt in seq_len(lenStList)) {
+                 
+                     #  state title header
+                     writeLines(" ",con=TxtCon)
+                     writeLines(paste0(str_pad("State",MaxColumn,"right"),AccumHdrSt),con=TxtCon)
+                 
+                     inSSt  <- ResSOrd[inSt]      # get order of states within cluster
+                     
+                     # State Summary Aggregate 
+                     wStr <- unlist(ResSt[inSSt,c("Name","LObserved","LExpected","LObs_Exp",
+                                   "LTCounty","LCountyIn","LPCCoIn",
+                                   "LTTracts","LTractsIn","LPCTrIn")],use.names=FALSE)
+                                  
+                     cat(wStr,"\n",sep="",append=TRUE, file=TxtCon)
+                     
+                     #
+                     #  Now do the detail county records for this state entry.
+                     #
+                     
+                     # Written State Summary - now for the county detail
+   	          
+                     CurStID          <- ResSt[inSSt,"stID"]
+                     
+                     # get part of list for one states counties.
+                     CoLocList        <- GisLocList[GisLocList$stID == CurStID,]
+                     
+                     # get sorted order (high ODE to low)
+                     CoLocOrd         <- order(CoLocList[,"Obs_Exp"],decreasing=TRUE)
+                     
+                     # nubmer of counties for this state within cluster 
+                     lenCoList        <- dim(CoLocList)[1]
+                     #cat("Length of County details list:",lenCoList,"\n")
+                     
+                     # County Details Header
+                     writeLines(" ",con=TxtCon)
+                     writeLines(paste0(str_pad("    County",MaxColumn,"right"),DetailHdrCo),con=TxtCon)
+      
+                     # County detail records
+                     for (inCo in c(1:lenCoList)) {
+      
+                        inSCo    <- CoLocOrd[inCo]
+                        cat(unlist(CoLocList[inSCo,c("Name","LObserved","LExpected","LObs_Exp",
+                                              "LTTracts","LTractsIn","LPCTrIn",
+                                              "LRelRisk","LCategory")]),"\n",
+                                              sep="",file=TxtCon,append=TRUE)
+                      
+                     }  # end of county loop within state within cluster
+                     
+                 } # end of state loop within cluster
+              } # end of county cluster
+              
+              if (idMode == 3) {
+                 # Census tract.
+                 
+                 #  Design:
+                 #    US Statistics
+                 #       Cluster
+                 #          US Summary
+                 #             State Summary
+                 #                County Summary
+                 #                   Place Summary
+                 #                      Trace Detail
+                 #     ...
+                 #
+                 
+                 #  US level - Cluster Summary
+                 #USRes$Lead       <- "                   "
+                 #
+                 #USRes$StatesIn   <- length(unique(GisLocList$stID))
+                 #USRes$LStatesIn  <- sprintf("%10i",USRes$StatesIn)
+                 #USRes$PCStIn     <- USRes$StatesIn/USRes$TStates * 100
+                 #USRes$LPCStIn    <- sprintf("%10.2f%%",USRes$PCStIn)
+                 #
+                 #USRes$CountyIn   <- sum(GisLocList$NCounty)
+                 #USRes$LCountyIn  <- sprintf("%10i",USRes$CountyIn)
+                 #USRes$PCCoIn     <- USRes$CountyIn/USRes$TCounty * 100
+                 #USRes$LPCCoIn    <- sprintf("%11.2f%%",USRes$PCCoIn)
+                 #
+                 #USRes$TractsIn   <- sum(GisLocList$NTracts)
+                 #USRes$LTractsIn  <- sprintf("%10i",USRes$TractsIn)
+                 #USRes$PCTrIn     <- USRes$TractsIn/USRes$TTracts * 100
+                 #USRes$LPCTrIn    <- sprintf("%10.2f%%",USRes$PCTrIn)
+                 #
+                 #USRes$Observed   <- sum(GisLocList$Observed)
+                 #USRes$Expected   <- sum(GisLocList$Expected)
+                 #USRes$ODE        <- USRes$Observed/USRes$Expected
+                 #USRes$LObserved  <- sprintf("%10i",USRes$Observed)
+                 #USRes$LExpected  <- sprintf("%10.3f",USRes$Expected)
+                 #USRes$LODE       <- sprintf("%9.3f",USRes$ODE)
+                 #
+                 ##writeLines(paste0(" US Cluster Summary:",AccumHdrUS),con=TxtCon)   
+                 ##cat(unlist(USRes[c("Lead","LObserved","LExpected","LODE",
+                 ##                      "LTStates","LStatesIn","LPCStIn",
+                 ##                      "LTCounty","LCountyIn","LPCCoIn",
+                 ##                      "LTTracts","LTractsIn","LPCTrIn")]),"\n",sep=" ",file=TxtCon)
+               
+                 ####
+                 #
+                 #  States - step through list of tracts...
+                 #
+                 ####
+                 #cat("GisLocList for cluster:\n")
+                 #print(GisLocList)
+                 
+                 #
+                 #  Tract to Place.  Aggregate all tracts to places for state.
+                 #
+                 #cat("Tract GisLocList to Place records\n")
+   	      plxx2 <- aggregate(cbind(Observed, Expected,  TractsIn) ~ State + stID + County + plKey + Place, data=GisLocList, FUN=sum)  # get sum of Obs and Exp
+   	      
+   	      #cat("plxx2 - aggregate SUM.\n")
+   	      #print(plxx2)
+   	      #print(str(plxx2))
+   	      #
+   	      #cat("Build Place table for tracts\n")
+   	      
+   	      #  State/County/Place Level Summary - Aggregate place to county.
+   	      
+   	      ResSCP           <- plxx2                  # number of tracts aggre up to Place.
+   	      colnames(ResSCP) <- c("State","stID","County","plKey","Place","Observed","Expected","TractsIn")
+   	      #ResSCP$stID     <- as.character(ResSCP$stID)
+   	      #ResSCP$State    <- as.character(st99.index[ResSCP$stID,"stName"])
+   	      ResSCP$stcoID    <- str_sub(ResSCP$plKey,1,5)
+   	      ResSCP$Name      <- str_pad(paste0("            ",ResSCP$Place),MaxColumn,"right")
+   	      #ResSCP$FCol     <- str_pad(ResSCP$Place,MaxColumn,"right")
+   	      
+   	      # sum tract Obs, Exp and ODE values within place.
+   	      #ResSCP$Observed  <- plxx2$Observed                      # sum tract values
+      
+   	      ResSCP$LObserved <- sprintf("%10.3f",ResSCP$Observed)
+   	      #ResSCP$Expected  <- plxx2$Expected
+   	      ResSCP$LExpected <- sprintf("%10.3f",ResSCP$Expected)
+   	      ResSCP$Obs_Exp   <- ResSCP$Observed / ResSCP$Expected
+   	      ResSCP[is.nan(ResSCP$Obs_Exp),"Obs_Exp"] = 0
+   	      ResSCP$LObs_Exp  <- sprintf("%9.3f",ResSCP$Obs_Exp)
+   	      
+   	      # sum of county values within place - NONE.
+   	      
+   	      # sum tract values
+   	      ResSCP$TTracts   <- pl99.index[ResSCP$plKey,"tracts"]   # total tracts for state
+   	      ResSCP$LTTracts  <- sprintf("%10i",ResSCP$TTracts)
+   	      #ResSCP$TractsIn  <- plxx2$TractsIn                      # in cluster tracts for state
+   	      ResSCP$LTractsIn <- sprintf("%10i",ResSCP$TractsIn)
+   	      ResSCP$PCTrIn    <- ResSCP$TractsIn/ResSCP$TTracts * 100
+   	      ResSCP$LPCTrIn   <- sprintf("%10.2f%%",ResSCP$PCTrIn)
+   	      
+   	      #cat("ResSCP - Z-5819 :\n")
+   	      #print(str(ResSCP))
+   	      #print(head(ResSCP,30))
+   	      
+   	      #
+   	      #   Place to County
+   	      #
+   	      
+                 #cat("Place aggregate to County \n")
+                 
+                 #  County Summary  (Aggregates by County of Place from Tract)
+                 coxx2 <- aggregate(cbind(Observed, Expected, TractsIn) ~ State + stID + County + stcoID, data=ResSCP, FUN=sum)  # get sum of Obs and Exp
+                 
+                 #cat("coxx2 - Z-5832 :\n")
+                 #print(coxx2)
+                 
+                 #cat("Build County Aggre Table for tract\n")
+                 
+                 #  State/County Level Summary 
+                 ResSC           <- coxx2                # number of counties
+                 colnames(ResSC) <- c("State","stID","County","stcoID","Observed","Expected", "TractsIn")
+                 #ResSC$stID      <- as.character(ResSC$stID)                       #>>>
+                 #ResSC$State     <- as.character(st99.index[ResSC$stID,"stName"])  #???
+                 ResSC$Name      <- str_pad(paste0("        ",ResSC$County),MaxColumn,"right")
+                 #ResSC$FCol      <- str_pad(ResSC$County,MaxColumn,"right")
+                 
+                 #cat("ResSC:\n")
+                 #print(ResSC)
+                 #print(str(ResSC))
+             
+                 # sum tract values
+                 #ResSC$Observed  <- coxx2$Observed                      # ??? sum place-tract values
+                 ResSC$LObserved <- sprintf("%10.3f",ResSC$Observed)
+                 #ResSC$Expected  <- coxx2$Expected                      # ???
+                 ResSC$LExpected <- sprintf("%10.3f",ResSC$Expected)
+                 ResSC$Obs_Exp   <- ResSC$Observed / ResSC$Expected
+                 ResSC[is.nan(ResSC$Obs_Exp),"Obs_Exp"] = 0
+                 ResSC$LObs_Exp  <- sprintf("%9.3f",ResSC$Obs_Exp)
+                 
+                 # Now at county level - set TCounty and CountyIn = 1
+                 ResSC$TCounty   <- 1                                   # total counties for state
+                 ResSC$LTCounty  <- sprintf("%10i",ResSC$TCounty)
+                 ResSC$CountyIn  <- 1                                   # in cluster counties for state
+                 ResSC$LCountyIn <- sprintf("%10i",ResSC$CountyIn)
+                 
+                 ResSC$PCCoIn    <- ResSC$CountyIn/ResSC$TCounty * 100
+                 ResSC$LPCCoIn   <- sprintf("%10.2f%%",ResSC$PCCoIn)
+                 
+                 # sum tract values
+                 ResSC$TTracts   <- co99.index[ResSC$stcoID,"tracts"]   # total tracts for state  (should sum, but this feels better)
+                 ResSC$LTTracts  <- sprintf("%10i",ResSC$TTracts)
+                 
+                 #ResSC$TractsIn  <- coxx2$TractsIn                      # ??? in cluster tracts for state
+      
+                 ResSC$LTractsIn <- sprintf("%10i",ResSC$TractsIn)
+                 ResSC$PCTrIn    <- ResSC$TractsIn/ResSC$TTracts * 100
+                 ResSC$LPCTrIn   <- sprintf("%10.2f%%",ResSC$PCTrIn)
+                 
+                 #cat("ResSC aggr from ResSCP\n")
+                 #print(str(ResSC))
+                 #print(head(ResSC,20))
+                 
+                 #cat("ResSC$Obs_Exp:",ResSC$Obs_Exp,"\n")
+                 #cat(typeof(ResSC$Obs_Exp),"\n")
+                 
+                 #  
+                 #  County aggregates to State level
+                 #
+   	      
+                 #cat(" County aggregate To State (from tract->Place-> County) \n")
+              
+                 stxx2 <- aggregate(cbind(Observed, Expected, CountyIn, TractsIn) ~ State + stID , data=ResSC, FUN=sum)  # get sum of Obs and Exp
+                   
+                 # the assumption is the rows in xx1 and xx2 are in the same order and match - one to one after
+                 #  the two aggregations.
+                 #cat("stxx2:\n")
+                 #print(stxx2)
+                 
+                 #cat("st99.index\n")
+                 #print(st99.index[,c("ID", "county_00", "county_10", "tracts_00", "tracts_10")])
+                 
+                 #cat("build state aggre table for tract.","\n")
+                 
+                 #  State Level Summary (Aggregates of County to State)
+                 ResSt           <- NULL
+                 #cat("dim(stxx2):",dim(stxx2),"\n")
+                 
+                 ResSt           <- stxx2
+                 colnames(ResSt) <- c("State", "stID", "Observed", "Expected", "CountyIn", "TractsIn")
+                 #ResSt$stID      <- as.character(ResSt$stID)    # ???
+                 #ResSt$State     <- as.character(st99.index[ResS$stID,"stName"])  # >>>
+                 ResSt$Name      <- str_pad(paste0("    ",ResSt$State),MaxColumn,"right")
+                 #ResSt$FCol      <- str_pad(ResSt$State,MaxColumn,"right")
+             
+                 #cat("ResSt:\n")
+                 #print(str(ResSt))
+                 #print(ResSt)
+                 
+                 # sum tract values
+                 #ResSt$Observed  <- stxx2$Observed                      # sum  tract values
+                 ResSt$LObserved <- sprintf("%10.3f",ResSt$Observed)
+                 #ResSt$Expected  <- stxx2$Expected
+                 ResSt$LExpected <- sprintf("%10.3f",ResSt$Expected)
+                 ResSt$Obs_Exp   <- ResSt$Observed / ResSt$Expected
+                 ResSt[is.nan(ResSt$Obs_Exp),"Obs_Exp"] = 0
+                 ResSt$LObs_Exp  <- sprintf("%9.3f",ResSt$Obs_Exp)
+                 
+                 # New state values
+                 ResSt$TState    <- 1
+                 ResSt$StatesIn  <- 1
+                 
+                 # sum county values
+                 ResSt$TCounty   <- st99.index[ResSt$stID,"county"]   # total counties for state
+                 ResSt$LTCounty  <- sprintf("%10i",ResSt$TCounty)
+                 #ResSt$CountyIn  <- stxx2$CountyIn                      # in cluster counties for state
+                 ResSt$LCountyIn <- sprintf("%10i",ResSt$CountyIn)
+                 
+                 ResSt$PCCoIn    <- ResSt$CountyIn/ResSt$TCounty * 100
+                 ResSt$LPCCoIn   <- sprintf("%10.2f%%",ResSt$PCCoIn)
+                 
+                 # sum tract values
+                 ResSt$TTracts   <- st99.index[ResSt$stID,"tracts"]   # total tracts for state
+                 ResSt$LTTracts  <- sprintf("%10i",ResSt$TTracts)
+                 #ResSt$TractsIn  <- stxx2$TractsIn                      # in cluster tracts for state
+                 ResSt$LTractsIn <- sprintf("%10i",ResSt$TractsIn)
+                 ResSt$PCTrIn    <- ResSt$TractsIn/ResSt$TTracts * 100
+                 ResSt$LPCTrIn   <- sprintf("%10.2f%%",ResSt$PCTrIn)
+                 
+                 #  State Header with County
+                 
+                 #cat("ResS Z-5949 :\n")
+                 #print(str(ResS))
+                 #print(head(ResS,10))
+                 
+                 ResSOrd <- order(ResSt$Obs_Exp,decreasing=TRUE)
+                 #cat("ResSOrd:",ResSOrd,"\n")
+                 
+                 #cat("starting Tract Report\n")
+                 # report 
+                 
+                 lenStList   <- length(ResSOrd)
+                 
+                 # state Loop
+                 for (inSt in seq_len(lenStList)) {
+                    writeLines(" ",con=TxtCon)
+                    # state header
+                    writeLines(paste0(str_pad("  State",MaxColumn,"right"),AccumHdrSt),con=TxtCon)
+                    
+                    inSSt        <- ResSOrd[inSt]
+                    CurStID      <- ResSt[inSSt,"stID"] # Get state ID for this loop.
+                    
+                    # State Summary Aggregate
+                    wStr <- unlist(ResSt[inSSt,c("Name","LObserved","LExpected","LObs_Exp",
+                                  "LTCounty","LCountyIn","LPCCoIn",
+                                  "LTTracts","LTractsIn","LPCTrIn")],use.names=FALSE)
+                                 
+                    cat(wStr,"\n",sep="",append=TRUE, file=TxtCon)
+                      
+   	         #  Aggregate to County
+                    
+                    #  Select counties within current state
+                    
+                    CoWrkRes     <- ResSC[ResSC$stID == CurStID,]    # get aggre for all counties in state.
+                    CoWrkOrd     <- order(CoWrkRes$Obs_Exp,decreasing=TRUE)
+                    lenCoWrkRes  <- length(CoWrkOrd)      # number of counties for state in cluster.
+      
+                    #cat("County agg within State:",CurStID,"\n")
+                    #cat("Length of County Work:",lenCoWrkRes,"\n")
+                    #cat("CoWrkRes:\n")
+                    #print(str(CoWrkRes))
+                    #print(head(CoWrkRes,20))
+                    
+                    #cat("CoWrkOrd:",CoWrkOrd,"\n")
+                     
+                    # county loop
+                    for (inCo in seq_len(lenCoWrkRes)) {
+                       # county header 
+                       writeLines(" ",con=TxtCon)
+                       writeLines(paste0(str_pad("      County",MaxColumn,"right"),AccumHdrCo),con=TxtCon)
+                    
+                       inSCo       <- CoWrkOrd[inCo]
+                       CurStcoID   <- ResSC[inSCo,"stcoID"]  # get current county id
+                       
+                       # County Aggre Record
+                       wStr      <- unlist(CoWrkRes[inSCo,c("Name","LObserved","LExpected","LObs_Exp",
+   		                            "LTTracts","LTractsIn","LPCTrIn")],use.names=FALSE)
+   		                            
+   		    cat(wStr,"\n",sep="",file=TxtCon,append=TRUE)
+   		    		    
+                       # Aggregate to Place
+                       #  get list of place summary records for state and county
+                       plWrkRes     <- ResSCP[ResSCP$stID == CurStID & ResSCP$stcoID == CurStcoID,]
+                       
+                       plWrkOrd     <- order(plWrkRes$Obs_Exp,decreasing=TRUE)
+                       
+                       lenPlWrkRes  <- length(plWrkOrd)       # number of entries
+      
+                       #cat("Place agg within State/County:",CurStcoID,"\n")
+                       #cat("Length of Place Work:",lenPlWrkRes,"\n")
+                       #cat("plWrkRes:\n")
+                       #print(str(plWrkRes))
+                       #print(head(plWrkRes,20))
+                       
+                       #cat("plWrkOrd:",plWrkOrd,"\n")
+                       
+                       # Place Loop
+                       for (inPl in seq_len(lenPlWrkRes)) {
+                          writeLines(" ",con=TxtCon)
+                          writeLines(paste0(str_pad("          Placename",MaxColumn,"right"),AccumHdrPl),con=TxtCon)
+                    
+                          inSPl     <- plWrkOrd[inPl]    # ordered index to placename data line
+                          
+                          CurPlKey  <- plWrkRes[inSPl,"plKey"]   # current entry
+                          #cat("CurPlKey:",CurPlKey,"\n")
+                          
+                          # Place Aggre Record - header.
+                          wStr     <- unlist(plWrkRes[inSPl,c("Name","LObserved","LExpected","LObs_Exp",
+                                             "LTTracts","LTractsIn","LPCTrIn")],use.names=FALSE)
+                          
+                          cat(wStr,"\n",sep="",file=TxtCon,append=TRUE)
+                    
+                          # Tract detail within place
+                          
+                          #cat("Tract Detail for place :",CurPlKey,"\n")
+                          
+                          trLocList  <- GisLocList[GisLocList$plKey == CurPlKey,]
+                          #cat("trLocList DF:\n")
+                          #print(str(trLocList))
+                          #print(trLocList)
+                          
+                          trLocOrd   <- order(trLocList$Obs_Exp,decreasing=TRUE)
+                          lenTrLoc   <- length(trLocOrd)
+                        
+                          #cat("Tract Detail within State/County/Place:",CurPlKey,"\n")
+                          #cat("Length of Tract Work:",lenTrLoc,"\n")
+                          #cat("trLocList:\n")
+                          #print(str(trLocList))
+                          #print(head(trLocList,20))
+         
+                          #cat("trLocOrd:",trLocOrd,"\n")
+                          
+                          #writeLines(" ",con=TxtCon)
+                          writeLines(paste0(str_pad("              Census Tract",MaxColumn,"right"),DetailHdrTr),con=TxtCon)
+                          
+                          # Tract Loop
+                          for (inTr in seq_len(lenTrLoc)) {
+                             inSTr  <- trLocOrd[inTr]
+                             wStr   <- unlist(trLocList[inSTr,c("Name","LObserved","LExpected","LObs_Exp",
+                                                    "LRelRisk","LCategory")],use.names=FALSE)
+                             cat(wStr,"\n",sep="",file=TxtCon,append=TRUE)
+                          }  # end of trace detail loop with in place 
+                       
+                       }  # end of place loop with in county
+   	         
+   	         }  # end of county loop within state within cluster
+                 } # end of state loop within cluster
+              } # end of tract cluster  (idMode = 3)
+      
+              writeLines(" ",con=TxtCon)
+              writeLines(" ",con=TxtCon)
+               
+              #  Wrap up reports.            
+              writeLines(" ",con=TxtCon)
+              writeLines(" ",con=TxtCon)
+      
+            } else {  
+              # no locations in cluster
+              writeLines("*** There are no locations found for this cluster ***",con=TxtCon)
+              writeLines(" ",con=TxtCon)
+              writeLines(" ",con=TxtCon)
+            }             
+              
+         } # end of For Cluster loop  
+      
+      } else {
+         xmsg <- paste0("*** No Cluster Data with P_VALUE < ",pValue," available in data.  ***")
+         writeLines(xmsg,con=TxtCon)
+         writeLines(" ",con=TxtCon)
+         writeLines(" ",con=TxtCon)
+      }
+      
+      ##########################
+      close(TxtCon)
+      
+      print("End of text report")
    
-   } else {
-      xmsg <- paste0("*** No Cluster Data with P_VALUE < ",pValue," available in data.  ***")
-      writeLines(xmsg,con=TxtCon)
-      writeLines(" ",con=TxtCon)
-      writeLines(" ",con=TxtCon)
-   }
-   
-   ##########################
-   close(TxtCon)
- 
-   print("End of text report")
-
+   } # Test Report bypass.
    ############################ end of report ##########################
 
    options(width=Save_Width)
